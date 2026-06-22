@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from sqlmodel import Session, select
+from sqlmodel import Session, delete, select
 
 from app.core.database import get_session
 from app.models.analysis import AnalysisRecord
@@ -16,6 +16,13 @@ def list_analyses(session: Session = Depends(get_session)) -> list[dict]:
         select(AnalysisRecord).order_by(AnalysisRecord.created_at.desc()).limit(20)
     ).all()
     return [record_to_result(record) for record in records]
+
+
+@router.delete("")
+def clear_analyses(session: Session = Depends(get_session)) -> dict[str, int]:
+    result = session.exec(delete(AnalysisRecord))
+    session.commit()
+    return {"deleted": result.rowcount or 0}
 
 
 @router.post("/text", response_model=AnalysisRead)
@@ -45,7 +52,7 @@ async def analyze_upload(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     if len(resume_text.strip()) < 20:
-        raise HTTPException(status_code=400, detail="Could not extract enough resume text.")
+        raise HTTPException(status_code=400, detail="无法从文件中提取足够的简历文本。")
 
     result = await analyze_resume(resume_text, job_description)
     record = AnalysisRecord(

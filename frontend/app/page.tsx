@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, History } from "lucide-react";
+import { BarChart3, History, Trash2 } from "lucide-react";
 import { AnalysisResult } from "@/components/analysis-result";
 import { AnalyzerForm } from "@/components/analyzer-form";
-import { listAnalyses, type Analysis } from "@/lib/api";
+import { clearAnalyses, listAnalyses, type Analysis } from "@/lib/api";
 
 export default function Home() {
   const [activeAnalysis, setActiveAnalysis] = useState<Analysis | null>(null);
@@ -22,6 +22,12 @@ export default function Home() {
   function handleAnalysis(analysis: Analysis) {
     setActiveAnalysis(analysis);
     setHistory((items) => [analysis, ...items.filter((item) => item.id !== analysis.id)]);
+  }
+
+  async function handleClearHistory() {
+    await clearAnalyses();
+    setHistory([]);
+    setActiveAnalysis(null);
   }
 
   return (
@@ -48,9 +54,22 @@ export default function Home() {
         </div>
 
         <aside className="rounded-lg border border-stone-200 bg-white/95 p-5 shadow-sm xl:sticky xl:top-6 xl:h-fit">
-          <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-clay" />
-            <h2 className="font-semibold text-ink">分析历史</h2>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <History className="h-5 w-5 text-clay" />
+              <h2 className="font-semibold text-ink">分析历史</h2>
+            </div>
+            {history.length > 0 ? (
+              <button
+                type="button"
+                onClick={handleClearHistory}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-stone-300 text-stone-600 transition hover:border-clay hover:text-clay"
+                aria-label="清空分析历史"
+                title="清空分析历史"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            ) : null}
           </div>
           <div className="mt-4 space-y-3">
             {history.length === 0 ? (

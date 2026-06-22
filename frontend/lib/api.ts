@@ -62,11 +62,21 @@ export async function listAnalyses(): Promise<Analysis[]> {
   return response.json();
 }
 
+export async function clearAnalyses(): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/analyses`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+}
+
 async function readError(response: Response): Promise<string> {
   try {
     const payload = await response.json();
-    return payload.detail ?? "Request failed";
+    return payload.detail ?? "请求失败";
   } catch {
-    return "Request failed";
+    return "请求失败";
   }
 }

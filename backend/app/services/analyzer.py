@@ -47,6 +47,8 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
     job_tokens = _keywords(job_description)
     overlap = sorted(job_tokens & resume_tokens)
     missing = sorted(job_tokens - resume_tokens)
+    overlap_labels = [_display_keyword(keyword) for keyword in overlap]
+    missing_labels = [_display_keyword(keyword) for keyword in missing]
     coverage = len(overlap) / max(len(job_tokens), 1)
     overlap_bonus = min(25, len(overlap) * 3)
     score = min(95, max(35, round(coverage * 100) + overlap_bonus + 8))
@@ -54,10 +56,10 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
     candidate_name = _guess_candidate_name(resume_text)
 
     strengths = [
-        f"简历中体现了「{keyword}」相关经验。" for keyword in overlap[:6]
+        f"简历中体现了「{keyword}」相关经验。" for keyword in overlap_labels[:6]
     ] or ["简历具备一定相关背景，但和岗位关键词的直接对应还不够明显。"]
     gaps = [
-        f"建议补充「{keyword}」方面的具体项目或成果。" for keyword in missing[:6]
+        f"建议补充「{keyword}」方面的具体项目或成果。" for keyword in missing_labels[:6]
     ] or ["本地分析未发现明显关键词缺口。"]
     recommendations = [
         "在简历开头增加一段面向目标岗位的个人摘要。",
@@ -71,7 +73,7 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         match_score=score,
         summary=(
             f"当前简历与岗位描述中的显性要求约有 {score}% 的匹配度。"
-            f"主要重合点包括：{', '.join(overlap[:5]) or '通用项目经验'}。"
+            f"主要重合点包括：{'、'.join(overlap_labels[:5]) or '通用项目经验'}。"
             "后续优化重点应放在岗位要求中尚未被简历充分证明的部分。"
         ),
         strengths=strengths,
@@ -80,7 +82,7 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         cover_letter=(
             "尊敬的招聘团队：\n\n"
             f"您好！我希望申请「{job_title}」岗位。我的经历与贵方在"
-            f"「{', '.join(overlap[:3]) or '核心岗位职责'}」方面的要求较为匹配，"
+            f"「{'、'.join(overlap_labels[:3]) or '核心岗位职责'}」方面的要求较为匹配，"
             "也期待有机会把相关项目经验和解决问题的能力带到团队中。\n\n"
             "此致\n"
             f"{candidate_name}"
@@ -102,6 +104,21 @@ def _keywords(text: str) -> set[str]:
     tokens = {word.strip(".,;:!?") for word in words if word not in stop_words}
     tokens.update(keyword for keyword in cn_keywords if keyword in text)
     return tokens
+
+
+def _display_keyword(keyword: str) -> str:
+    display_map = {
+        "ai": "AI",
+        "api": "API",
+        "fastapi": "FastAPI",
+        "postgresql": "PostgreSQL",
+        "react": "React",
+        "sql": "SQL",
+        "typescript": "TypeScript",
+        "javascript": "JavaScript",
+        "python": "Python",
+    }
+    return display_map.get(keyword, keyword)
 
 
 def _guess_job_title(job_description: str) -> str:

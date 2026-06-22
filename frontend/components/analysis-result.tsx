@@ -27,17 +27,17 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
       <div className="grid gap-4 lg:grid-cols-3">
         <InsightList
           icon={<CheckCircle2 className="h-5 w-5" />}
-          title="Strengths"
+          title="匹配优势"
           items={analysis.strengths}
         />
         <InsightList
           icon={<TriangleAlert className="h-5 w-5" />}
-          title="Gaps"
+          title="能力差距"
           items={analysis.gaps}
         />
         <InsightList
           icon={<Lightbulb className="h-5 w-5" />}
-          title="Next Actions"
+          title="优化建议"
           items={analysis.recommendations}
         />
       </div>
@@ -45,7 +45,7 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
       <div className="rounded-lg border border-stone-200 bg-white/90 p-5 shadow-sm">
         <div className="flex items-center gap-2 text-ink">
           <FileText className="h-5 w-5 text-clay" />
-          <h3 className="font-semibold">Draft Cover Letter</h3>
+          <h3 className="font-semibold">求职信草稿</h3>
         </div>
         <pre className="mt-4 whitespace-pre-wrap rounded-md bg-stone-100 p-4 text-sm leading-6 text-stone-800">
           {analysis.cover_letter}

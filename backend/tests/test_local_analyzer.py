@@ -7,11 +7,11 @@ def test_local_analyzer_returns_score_without_openai_key(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "")
     result = asyncio.run(
         analyze_resume(
-            "Jane Doe\nPython FastAPI SQL React data dashboards",
-            "Senior Full Stack Engineer\nWe need Python, FastAPI, React, SQL, and dashboard experience.",
+            "张明\n全栈工程师\n熟悉 React、FastAPI、PostgreSQL、AI 工作流和数据看板开发。",
+            "高级全栈工程师\n需要 React、FastAPI、PostgreSQL、AI 产品和数据看板经验。",
         )
     )
 
     assert result.match_score >= 50
-    assert result.candidate_name == "Jane Doe"
+    assert result.candidate_name == "张明"
     assert result.strengths

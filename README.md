@@ -1,34 +1,36 @@
-# AI Resume Job Matcher
+# AI 简历岗位匹配助手
 
-An AI-powered full-stack application that compares a resume against a job description, scores the fit, identifies strengths and gaps, recommends resume improvements, and drafts a tailored cover letter.
+一个 AI 全栈项目：用户可以粘贴或上传简历，再输入目标岗位描述，系统会自动分析简历与岗位的匹配度，给出评分、优势、差距、优化建议，并生成一封定制化求职信草稿。
 
-The project is designed to be GitHub-ready: it includes a usable frontend, FastAPI backend, database persistence, file parsing, optional OpenAI integration, Docker support, tests, and clear setup docs.
+这个项目适合用于 GitHub 展示，包含可用的前端界面、FastAPI 后端、数据库持久化、文件解析、可选 OpenAI 接入、Docker 配置、测试和完整启动说明。
 
-## Features
+## 功能
 
-- Paste resume text or upload PDF, DOCX, or TXT resumes
-- Paste any job description
-- Generate match score, summary, strengths, gaps, recommendations, and cover letter
-- Save analysis history in SQLite by default
-- Works without an API key using a local keyword-based analyzer
-- Uses OpenAI automatically when `OPENAI_API_KEY` is configured
-- Includes Docker Compose for local full-stack startup
+- 支持粘贴简历文本
+- 支持上传 PDF、DOCX、TXT 简历文件
+- 支持输入任意岗位描述
+- 自动生成岗位匹配分数、总结、匹配优势、能力差距和优化建议
+- 自动生成中文求职信草稿
+- 默认使用 SQLite 保存历史分析记录
+- 未配置 OpenAI API Key 时，使用本地关键词分析器，方便直接演示
+- 配置 `OPENAI_API_KEY` 后，自动切换到 OpenAI 模型分析
+- 提供 Docker Compose 本地一键启动方案
 
-## Tech Stack
+## 技术栈
 
-- Frontend: Next.js, React, TypeScript, Tailwind CSS, lucide-react
-- Backend: FastAPI, SQLModel, Pydantic, SQLite
-- AI: OpenAI API with local fallback analyzer
-- File parsing: pypdf, python-docx
-- DevOps: Docker, Docker Compose
-- Testing: pytest
+- 前端：Next.js、React、TypeScript、Tailwind CSS、lucide-react
+- 后端：FastAPI、SQLModel、Pydantic、SQLite
+- AI：OpenAI API + 本地 fallback 分析器
+- 文件解析：pypdf、python-docx
+- 工程化：Docker、Docker Compose
+- 测试：pytest
 
-## Architecture
+## 架构
 
 ```txt
-Browser
+浏览器
   |
-  | Next.js UI
+  | Next.js 界面
   v
 Frontend :3000
   |
@@ -38,25 +40,25 @@ FastAPI Backend :8000
   |
   | SQLModel
   v
-SQLite database
+SQLite 数据库
   |
-  | optional
+  | 可选
   v
 OpenAI API
 ```
 
-## Project Structure
+## 项目结构
 
 ```txt
 ai-resume-job-matcher/
   backend/
     app/
-      api/
-      core/
-      models/
-      prompts/
-      schemas/
-      services/
+      api/          # API 路由
+      core/         # 配置和数据库
+      models/       # 数据表模型
+      prompts/      # AI Prompt
+      schemas/      # 请求和响应结构
+      services/     # 业务逻辑
     tests/
   frontend/
     app/
@@ -65,9 +67,9 @@ ai-resume-job-matcher/
   docker-compose.yml
 ```
 
-## Local Setup
+## 本地启动
 
-### 1. Backend
+### 1. 启动后端
 
 ```bash
 cd backend
@@ -78,19 +80,19 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Backend runs at:
+后端地址：
 
 ```txt
 http://localhost:8000
 ```
 
-API docs:
+API 文档：
 
 ```txt
 http://localhost:8000/docs
 ```
 
-### 2. Frontend
+### 2. 启动前端
 
 ```bash
 cd frontend
@@ -99,15 +101,15 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
+前端地址：
 
 ```txt
 http://localhost:3000
 ```
 
-## Docker Setup
+## Docker 启动
 
-Create environment files first:
+先创建环境变量文件：
 
 ```bash
 cp backend/.env.example backend/.env
@@ -115,52 +117,52 @@ cp frontend/.env.example frontend/.env
 docker compose up --build
 ```
 
-## OpenAI Configuration
+## OpenAI 配置
 
-The app runs without OpenAI. To enable AI-quality analysis, set:
+项目不配置 OpenAI 也可以运行。要启用模型分析，在 `backend/.env` 中设置：
 
 ```env
 OPENAI_API_KEY="your_api_key"
 OPENAI_MODEL="gpt-4o-mini"
 ```
 
-When no key is present, the backend uses a deterministic local analyzer so reviewers can test the project immediately.
+未设置 API Key 时，后端会使用确定性的本地关键词分析器，方便面试官或 GitHub 访问者快速体验项目。
 
-## API Endpoints
+## API 接口
 
-| Method | Endpoint | Description |
+| 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/health` | Backend health check |
-| GET | `/api/analyses` | List recent analyses |
-| POST | `/api/analyses/text` | Analyze pasted resume text |
-| POST | `/api/analyses/upload` | Analyze uploaded resume file |
+| GET | `/health` | 后端健康检查 |
+| GET | `/api/analyses` | 获取最近分析记录 |
+| POST | `/api/analyses/text` | 分析粘贴的简历文本 |
+| POST | `/api/analyses/upload` | 分析上传的简历文件 |
 
-Example request:
+请求示例：
 
 ```bash
 curl -X POST http://localhost:8000/api/analyses/text \
   -H "Content-Type: application/json" \
   -d '{
-    "resume_text": "Jane Doe\nReact FastAPI PostgreSQL dashboard experience",
-    "job_description": "Senior Full Stack Engineer with React, FastAPI, PostgreSQL and AI experience"
+    "resume_text": "张明\n全栈工程师，熟悉 React、FastAPI、PostgreSQL 和数据看板开发。",
+    "job_description": "高级全栈工程师，需要 React、FastAPI、PostgreSQL、AI 产品和数据看板经验。"
   }'
 ```
 
-## Testing
+## 测试
 
 ```bash
 cd backend
 pytest
 ```
 
-## Roadmap
+## 后续规划
 
-- Add authentication and per-user analysis history
-- Add PostgreSQL profile for production deployment
-- Add RAG over previous resumes and job descriptions
-- Add export to PDF for generated recommendations
-- Add richer scoring categories such as skills, seniority, domain, and impact
-- Add CI with backend tests and frontend linting
+- 增加登录系统和按用户隔离的分析历史
+- 增加 PostgreSQL 生产环境配置
+- 增加更细的评分维度，例如技能、经验年限、行业匹配、项目影响力
+- 增加分析结果 PDF 导出
+- 增加 RAG，用历史简历和岗位记录做个性化建议
+- 增加 CI，自动运行后端测试和前端构建
 
 ## License
 

@@ -30,9 +30,9 @@ async def _analyze_with_openai(resume_text: str, job_description: str) -> Analys
             {
                 "role": "user",
                 "content": (
-                    "Resume:\n"
+                    "简历：\n"
                     f"{resume_text[:12000]}\n\n"
-                    "Job description:\n"
+                    "岗位描述：\n"
                     f"{job_description[:8000]}"
                 ),
             },
@@ -54,15 +54,15 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
     candidate_name = _guess_candidate_name(resume_text)
 
     strengths = [
-        f"Resume mentions {keyword}." for keyword in overlap[:6]
-    ] or ["Resume contains relevant background, but keyword evidence is limited."]
+        f"简历中体现了「{keyword}」相关经验。" for keyword in overlap[:6]
+    ] or ["简历具备一定相关背景，但和岗位关键词的直接对应还不够明显。"]
     gaps = [
-        f"Add clearer evidence for {keyword}." for keyword in missing[:6]
-    ] or ["No major keyword gaps found in the local analysis."]
+        f"建议补充「{keyword}」方面的具体项目或成果。" for keyword in missing[:6]
+    ] or ["本地分析未发现明显关键词缺口。"]
     recommendations = [
-        "Add a role-specific summary at the top of the resume.",
-        "Mirror the strongest job requirements with measurable achievements.",
-        "Use project bullets that include tools, business context, and outcomes.",
+        "在简历开头增加一段面向目标岗位的个人摘要。",
+        "把岗位中最核心的要求对应到可量化的项目成果上。",
+        "项目经历建议同时写清技术工具、业务场景和最终结果。",
     ]
 
     return AnalysisResult(
@@ -70,19 +70,19 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         job_title=job_title,
         match_score=score,
         summary=(
-            f"The resume currently matches about {score}% of the visible job signals. "
-            f"Strong overlap includes {', '.join(overlap[:5]) or 'general experience'}, "
-            "while the highest-value improvements are in the missing requirements."
+            f"当前简历与岗位描述中的显性要求约有 {score}% 的匹配度。"
+            f"主要重合点包括：{', '.join(overlap[:5]) or '通用项目经验'}。"
+            "后续优化重点应放在岗位要求中尚未被简历充分证明的部分。"
         ),
         strengths=strengths,
         gaps=gaps,
         recommendations=recommendations,
         cover_letter=(
-            f"Dear hiring team,\n\n"
-            f"I am excited to apply for the {job_title} role. My background aligns with "
-            f"your needs around {', '.join(overlap[:3]) or 'the core responsibilities'}, "
-            "and I would welcome the chance to bring that experience to your team.\n\n"
-            "Sincerely,\n"
+            "尊敬的招聘团队：\n\n"
+            f"您好！我希望申请「{job_title}」岗位。我的经历与贵方在"
+            f"「{', '.join(overlap[:3]) or '核心岗位职责'}」方面的要求较为匹配，"
+            "也期待有机会把相关项目经验和解决问题的能力带到团队中。\n\n"
+            "此致\n"
             f"{candidate_name}"
         ),
     )
@@ -94,28 +94,41 @@ def _keywords(text: str) -> set[str]:
         "will", "have", "has", "our", "their", "role", "team", "work", "years",
         "experience", "candidate", "responsibilities", "requirements",
     }
+    cn_keywords = {
+        "全栈", "前端", "后端", "数据看板", "看板", "数据库", "自动化测试",
+        "测试", "产品", "工程师", "项目", "运营", "工作流", "简历", "岗位",
+    }
     words = re.findall(r"[a-zA-Z][a-zA-Z+#.-]{2,}", text.lower())
-    return {word.strip(".,;:!?") for word in words if word not in stop_words}
+    tokens = {word.strip(".,;:!?") for word in words if word not in stop_words}
+    tokens.update(keyword for keyword in cn_keywords if keyword in text)
+    return tokens
 
 
 def _guess_job_title(job_description: str) -> str:
     first_line = next((line.strip() for line in job_description.splitlines() if line.strip()), "")
     if len(first_line.split()) <= 8:
-        return first_line.title()
+        return first_line if _has_cjk(first_line) else first_line.title()
     patterns = [r"(?:hiring|seeking|looking for)\s+(?:an?\s+)?([^.,\n]+)"]
     for pattern in patterns:
         match = re.search(pattern, job_description, re.IGNORECASE)
         if match:
-            return match.group(1).strip().title()
-    return "Target Role"
+            title = match.group(1).strip()
+            return title if _has_cjk(title) else title.title()
+    return "目标岗位"
 
 
 def _guess_candidate_name(resume_text: str) -> str:
     for line in resume_text.splitlines()[:5]:
         clean = line.strip()
+        if 2 <= len(clean) <= 6 and _has_cjk(clean) and not any(char.isdigit() for char in clean):
+            return clean
         if 2 <= len(clean.split()) <= 4 and not any(char.isdigit() for char in clean):
             return clean
-    return "Candidate"
+    return "候选人"
+
+
+def _has_cjk(text: str) -> bool:
+    return any("\u4e00" <= char <= "\u9fff" for char in text)
 
 
 def result_to_record_payload(result: AnalysisResult, resume_text: str, job_description: str) -> dict:

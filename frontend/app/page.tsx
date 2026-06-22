@@ -29,15 +29,15 @@ export default function Home() {
       <header className="flex flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-clay">
-            AI Resume Job Matcher
+            AI 简历岗位匹配助手
           </p>
           <h1 className="mt-2 max-w-3xl text-4xl font-semibold text-ink md:text-5xl">
-            Match every resume to the role that matters.
+            让每一份简历都更贴近目标岗位。
           </h1>
         </div>
         <div className="flex items-center gap-2 rounded-md border border-stone-300 bg-white/80 px-3 py-2 text-sm text-stone-700">
           <BarChart3 className="h-4 w-4 text-moss" />
-          {history.length} saved analyses
+          已保存 {history.length} 次分析
         </div>
       </header>
 
@@ -50,12 +50,12 @@ export default function Home() {
         <aside className="rounded-lg border border-stone-200 bg-white/95 p-5 shadow-sm xl:sticky xl:top-6 xl:h-fit">
           <div className="flex items-center gap-2">
             <History className="h-5 w-5 text-clay" />
-            <h2 className="font-semibold text-ink">History</h2>
+            <h2 className="font-semibold text-ink">分析历史</h2>
           </div>
           <div className="mt-4 space-y-3">
             {history.length === 0 ? (
               <p className="text-sm leading-6 text-stone-600">
-                Analysis history appears here after the backend is running.
+                后端启动后，新的分析记录会显示在这里。
               </p>
             ) : (
               history.map((item) => (

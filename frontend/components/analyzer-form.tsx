@@ -9,10 +9,10 @@ type AnalyzerFormProps = {
 };
 
 const SAMPLE_RESUME =
-  "Jane Doe\nFull Stack Engineer\nBuilt React dashboards, FastAPI services, PostgreSQL data models, and AI workflow tools for operations teams.";
+  "张明\n全栈工程师\n负责搭建 React 数据看板、FastAPI 后端服务、PostgreSQL 数据模型，并为运营团队开发 AI 工作流工具。";
 
 const SAMPLE_JOB =
-  "Senior Full Stack Engineer\nWe need a developer with React, FastAPI, PostgreSQL, AI product experience, testing, and dashboard design skills.";
+  "高级全栈工程师\n我们需要一名熟悉 React、FastAPI、PostgreSQL、AI 产品、自动化测试和数据看板设计的工程师。";
 
 export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);
@@ -32,7 +32,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         : await analyzeText(resumeText, jobDescription);
       onAnalysis(result);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Analysis failed");
+      setError(caught instanceof Error ? caught.message : "分析失败，请稍后重试");
     } finally {
       setIsLoading(false);
     }
@@ -45,12 +45,12 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
     >
       <div className="flex items-center gap-2">
         <ClipboardList className="h-5 w-5 text-clay" />
-        <h2 className="text-lg font-semibold text-ink">Analyze Fit</h2>
+        <h2 className="text-lg font-semibold text-ink">岗位匹配分析</h2>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-medium text-stone-700">Resume text</span>
+          <span className="text-sm font-medium text-stone-700">简历内容</span>
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
@@ -61,7 +61,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
         <label className="block">
           <span className="text-sm font-medium text-stone-700">
-            Job description
+            岗位描述
           </span>
           <textarea
             value={jobDescription}
@@ -94,13 +94,13 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           ) : (
             <Send className="h-4 w-4" />
           )}
-          Analyze
+          开始分析
         </button>
       </div>
 
       {resumeFile ? (
         <p className="mt-3 text-xs text-stone-500">
-          Using uploaded file instead of pasted resume text: {resumeFile.name}
+          当前使用上传文件进行分析：{resumeFile.name}
         </p>
       ) : null}
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}

@@ -69,13 +69,13 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1480px] gap-4 px-4 py-5 md:px-6 xl:h-[calc(100vh-65px)] xl:grid-cols-[330px_minmax(0,1fr)_280px] xl:overflow-hidden">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-4 px-4 py-5 md:px-6 xl:h-[calc(100vh-65px)] xl:grid-cols-[300px_minmax(0,1fr)_300px] xl:overflow-hidden">
         <div className="min-h-0">
           <AnalyzerForm onAnalysis={handleAnalysis} />
         </div>
 
-        <section className="min-h-0 min-w-0 xl:overflow-auto xl:pr-1">
-          <div className="mb-4 grid gap-2 md:grid-cols-3">
+        <section className="flex min-h-0 min-w-0 flex-col">
+          <div className="grid shrink-0 gap-2 md:grid-cols-3">
             <WorkflowStep
               icon={<Target className="h-4 w-4" />}
               eyebrow="01"
@@ -96,9 +96,11 @@ export default function Home() {
             />
           </div>
           {activeAnalysis ? (
-            <AnalysisResult analysis={activeAnalysis} />
+            <div className="mt-4 min-h-0 flex-1 overflow-auto pr-1">
+              <AnalysisResult analysis={activeAnalysis} />
+            </div>
           ) : (
-            <div className="min-h-[520px] overflow-hidden rounded-lg border border-[#ded7cf] bg-[#fffdf9] shadow-[0_18px_48px_rgba(31,27,24,0.08)]">
+            <div className="mt-4 flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-lg border border-[#ded7cf] bg-[#fffdf9] shadow-[0_18px_48px_rgba(31,27,24,0.08)]">
               <div className="border-b border-[#ece5dd] bg-[#fbf7f1] px-5 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -108,7 +110,7 @@ export default function Home() {
                   <span className="text-xs text-muted">等待生成</span>
                 </div>
               </div>
-              <div className="grid min-h-[470px] place-items-center p-8 text-center">
+              <div className="grid flex-1 place-items-center p-8 text-center">
                 <div className="max-w-xl">
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#efe0d8] text-copper shadow-sm">
                     <Target className="h-8 w-8" />

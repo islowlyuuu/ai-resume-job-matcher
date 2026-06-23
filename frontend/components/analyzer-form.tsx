@@ -50,7 +50,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
       onSubmit={handleSubmit}
       className="flex h-full min-h-[640px] flex-col overflow-hidden rounded-lg border border-[#ded7cf] bg-[#fffdfa] shadow-[0_14px_42px_rgba(31,27,24,0.08)] xl:min-h-0"
     >
-      <div className="flex items-start justify-between gap-3 border-b border-[#e8e1da] bg-[#fbf7f1] px-5 py-4">
+      <div className="flex items-start justify-between gap-3 border-b border-[#e8e1da] bg-[#fbf7f1] px-4 py-4">
         <div className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-md bg-[#2b2521] text-white">
             <ClipboardList className="h-5 w-5" />
@@ -75,7 +75,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </button>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-rows-2 gap-4 px-5 py-5">
+      <div className="grid min-h-0 flex-1 grid-rows-2 gap-4 px-4 py-4">
         <label className="flex min-h-0 flex-col">
           <span className="flex items-center gap-2 text-sm font-semibold text-ink">
             <TextCursorInput className="h-4 w-4 text-copper" />
@@ -104,7 +104,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </label>
       </div>
 
-      <div className="shrink-0 space-y-3 border-t border-[#e8e1da] bg-[#fbf7f1] px-5 py-4">
+      <div className="shrink-0 space-y-3 border-t border-[#e8e1da] bg-[#fbf7f1] px-4 py-4">
         <label className="inline-flex max-w-full cursor-pointer items-center gap-2 text-sm text-muted">
           <FileUp className="h-4 w-4 shrink-0 text-copper" />
           <input
@@ -130,11 +130,11 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
       </div>
 
       {resumeFile ? (
-        <p className="px-5 pb-4 text-xs text-muted">
+        <p className="px-4 pb-4 text-xs text-muted">
           当前使用上传文件进行分析：{resumeFile.name}
         </p>
       ) : null}
-      {error ? <p className="px-5 pb-4 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="px-4 pb-4 text-sm text-red-700">{error}</p> : null}
     </form>
   );
 }

@@ -58,16 +58,16 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1500px] gap-4 px-4 py-4 md:px-6 xl:grid-cols-[390px_minmax(0,1fr)_320px]">
-        <div className="xl:sticky xl:top-4 xl:h-[calc(100vh-2rem)] xl:overflow-auto">
+      <div className="mx-auto grid w-full max-w-[1500px] gap-4 px-4 py-4 md:px-6 xl:h-[calc(100vh-73px)] xl:grid-cols-[420px_minmax(0,1fr)_320px] xl:overflow-hidden">
+        <div className="min-h-0">
           <AnalyzerForm onAnalysis={handleAnalysis} />
         </div>
 
-        <section className="min-w-0">
+        <section className="min-h-0 min-w-0 xl:overflow-auto xl:pr-1">
           {activeAnalysis ? (
             <AnalysisResult analysis={activeAnalysis} />
           ) : (
-            <div className="grid min-h-[520px] place-items-center rounded-lg border border-dashed border-stone-300 bg-white/70 p-8 text-center">
+            <div className="grid h-full min-h-[420px] place-items-center rounded-lg border border-dashed border-stone-300 bg-white/70 p-8 text-center">
               <div>
                 <Target className="mx-auto h-10 w-10 text-clay" />
                 <h1 className="mt-4 text-2xl font-semibold text-ink">
@@ -81,7 +81,7 @@ export default function Home() {
           )}
         </section>
 
-        <aside className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm xl:sticky xl:top-4 xl:h-fit">
+        <aside className="min-h-0 rounded-lg border border-stone-200 bg-white p-4 shadow-sm xl:h-full xl:overflow-auto">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <History className="h-5 w-5 text-clay" />

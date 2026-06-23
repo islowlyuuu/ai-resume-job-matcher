@@ -41,7 +41,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm"
+      className="flex h-full min-h-[640px] flex-col rounded-lg border border-stone-200 bg-white p-4 shadow-sm xl:min-h-0"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -63,32 +63,30 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 space-y-4">
-        <label className="block">
+      <div className="mt-4 grid min-h-0 flex-1 grid-rows-2 gap-4">
+        <label className="flex min-h-0 flex-col">
           <span className="text-sm font-medium text-stone-700">简历内容</span>
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
-            rows={9}
-            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
           />
         </label>
 
-        <label className="block">
+        <label className="flex min-h-0 flex-col">
           <span className="text-sm font-medium text-stone-700">
             岗位描述
           </span>
           <textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
-            rows={9}
             required
-            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
           />
         </label>
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 border-t border-stone-200 pt-4">
+      <div className="mt-4 shrink-0 space-y-3 border-t border-stone-200 pt-4">
         <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-stone-700">
           <FileUp className="h-4 w-4 text-moss" />
           <input

@@ -114,6 +114,9 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             className="min-w-0 max-w-64 text-sm"
           />
         </label>
+        <p className="rounded-md border border-[#eaded6] bg-white px-3 py-2 text-xs leading-5 text-muted">
+          仅支持 PDF 和 Word（.docx）格式；也可以直接粘贴简历内容。
+        </p>
 
         <button
           type="submit"

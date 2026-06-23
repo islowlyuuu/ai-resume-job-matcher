@@ -72,8 +72,8 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </button>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-rows-2 gap-4 px-4 py-4">
-        <label className="flex min-h-0 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col gap-5 px-4 py-4">
+        <label className="flex min-h-0 flex-1 flex-col">
           <span className="text-sm font-semibold text-ink">
             简历内容
           </span>
@@ -81,11 +81,11 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
             placeholder="粘贴你当前简历，或者上传 PDF / Word"
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
+            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
 
-        <label className="flex min-h-0 flex-col">
+        <label className="flex min-h-0 flex-1 flex-col">
           <span className="text-sm font-semibold text-ink">
             岗位描述
           </span>
@@ -94,7 +94,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             onChange={(event) => setJobDescription(event.target.value)}
             required
             placeholder="粘贴 Boss 岗位要求、任职资格、加分项"
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
+            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
       </div>

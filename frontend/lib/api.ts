@@ -11,10 +11,18 @@ export type Analysis = {
   optimized_summary: string;
   rewritten_bullets: string[];
   ats_keywords: string[];
+  job_core_skills: string[];
+  job_business_contexts: string[];
+  job_bonus_points: string[];
+  job_hard_requirements: string[];
+  covered_keywords: string[];
+  missing_keywords: string[];
   edit_notes: string[];
   cover_letter: string;
   created_at: string;
 };
+
+export type OutputMode = "boss" | "formal" | "intern";
 
 export type SnapshotSaveResponse = {
   filename: string;
@@ -26,14 +34,16 @@ const API_BASE_URL =
 
 export async function analyzeText(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
+  outputMode: OutputMode
 ): Promise<Analysis> {
   const response = await fetch(`${API_BASE_URL}/api/analyses/text`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       resume_text: resumeText,
-      job_description: jobDescription
+      job_description: jobDescription,
+      output_mode: outputMode
     })
   });
 
@@ -45,11 +55,13 @@ export async function analyzeText(
 
 export async function analyzeUpload(
   resume: File,
-  jobDescription: string
+  jobDescription: string,
+  outputMode: OutputMode
 ): Promise<Analysis> {
   const formData = new FormData();
   formData.append("resume", resume);
   formData.append("job_description", jobDescription);
+  formData.append("output_mode", outputMode);
 
   const response = await fetch(`${API_BASE_URL}/api/analyses/upload`, {
     method: "POST",
@@ -93,6 +105,13 @@ export async function saveAnalysisSnapshot(
     throw new Error(await readError(response));
   }
   return response.json();
+}
+
+export function exportAnalysisUrl(
+  analysisId: number,
+  format: "docx" | "pdf"
+): string {
+  return `${API_BASE_URL}/api/analyses/${analysisId}/export/${format}`;
 }
 
 async function readError(response: Response): Promise<string> {

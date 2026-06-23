@@ -11,14 +11,22 @@ from app.schemas.analysis import AnalysisResult
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "resume_matcher.md"
 
 
-async def analyze_resume(resume_text: str, job_description: str) -> AnalysisResult:
+async def analyze_resume(
+    resume_text: str,
+    job_description: str,
+    output_mode: str = "boss",
+) -> AnalysisResult:
     settings = get_settings()
     if settings.openai_api_key:
-        return await _analyze_with_openai(resume_text, job_description)
-    return _analyze_locally(resume_text, job_description)
+        return await _analyze_with_openai(resume_text, job_description, output_mode)
+    return _analyze_locally(resume_text, job_description, output_mode)
 
 
-async def _analyze_with_openai(resume_text: str, job_description: str) -> AnalysisResult:
+async def _analyze_with_openai(
+    resume_text: str,
+    job_description: str,
+    output_mode: str,
+) -> AnalysisResult:
     settings = get_settings()
     client = AsyncOpenAI(api_key=settings.openai_api_key)
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
@@ -33,16 +41,22 @@ async def _analyze_with_openai(resume_text: str, job_description: str) -> Analys
                     "简历：\n"
                     f"{resume_text[:12000]}\n\n"
                     "岗位描述：\n"
-                    f"{job_description[:8000]}"
+                    f"{job_description[:8000]}\n\n"
+                    f"输出模式：{_mode_label(output_mode)}"
                 ),
             },
         ],
     )
     content = response.choices[0].message.content or "{}"
-    return AnalysisResult.model_validate_json(content)
+    result = AnalysisResult.model_validate_json(content)
+    return _with_missing_structured_fields(result)
 
 
-def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
+def _analyze_locally(
+    resume_text: str,
+    job_description: str,
+    output_mode: str = "boss",
+) -> AnalysisResult:
     resume_tokens = _keywords(resume_text)
     job_tokens = _keywords(job_description)
     overlap = sorted(job_tokens & resume_tokens)
@@ -70,6 +84,10 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
     optimized_summary = _build_optimized_summary(candidate_name, job_title, overlap_labels)
     rewritten_bullets = _build_rewritten_bullets(overlap_labels, missing_labels)
     ats_keywords = _dedupe_preserve_order([*overlap_labels, *missing_labels])[:12]
+    job_core_skills = _extract_core_skills(job_tokens)
+    job_business_contexts = _extract_business_contexts(job_description)
+    job_bonus_points = _extract_bonus_points(job_description)
+    job_hard_requirements = _extract_hard_requirements(job_description, job_core_skills)
     edit_notes = [
         "把简历标题直接对齐目标岗位，方便招聘方快速判断方向匹配。",
         "摘要优先突出岗位中反复出现的技能和业务场景。",
@@ -93,8 +111,14 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         optimized_summary=optimized_summary,
         rewritten_bullets=rewritten_bullets,
         ats_keywords=ats_keywords,
+        job_core_skills=job_core_skills,
+        job_business_contexts=job_business_contexts,
+        job_bonus_points=job_bonus_points,
+        job_hard_requirements=job_hard_requirements,
+        covered_keywords=overlap_labels[:10],
+        missing_keywords=missing_labels[:10],
         edit_notes=edit_notes,
-        cover_letter=_build_boss_openers(job_title, overlap_labels),
+        cover_letter=_build_openers(job_title, overlap_labels, output_mode),
     )
 
 
@@ -164,8 +188,24 @@ def _build_rewritten_bullets(
     return bullets
 
 
-def _build_boss_openers(job_title: str, overlap_labels: list[str]) -> str:
+def _build_openers(job_title: str, overlap_labels: list[str], output_mode: str) -> str:
     focus = "、".join(overlap_labels[:3]) if overlap_labels else "岗位方向"
+    if output_mode == "formal":
+        return "\n".join(
+            [
+                f"您好，我关注到贵团队的{job_title}岗位，我有{focus}相关经验，希望有机会进一步沟通。",
+                f"您好，我的经历与{job_title}岗位中的{focus}方向较匹配，想了解一下岗位细节。",
+                f"您好，我对这个{job_title}机会比较感兴趣，过往做过{focus}相关工作，方便沟通吗？",
+            ]
+        )
+    if output_mode == "intern":
+        return "\n".join(
+            [
+                f"您好，我对{job_title}方向很感兴趣，之前接触过{focus}，想了解下这个机会。",
+                f"您好，我有{focus}相关学习或项目经历，想投递这个{job_title}岗位。",
+                f"您好，这个岗位方向和我准备的{focus}比较接近，方便进一步沟通吗？",
+            ]
+        )
     return "\n".join(
         [
             f"您好，我看了这个{job_title}岗位，和我之前做的{focus}方向比较接近，想进一步了解一下。",
@@ -173,6 +213,57 @@ def _build_boss_openers(job_title: str, overlap_labels: list[str]) -> str:
             f"您好，这个岗位方向我比较感兴趣，我之前有{focus}相关经历，方便的话想了解下团队情况。",
         ]
     )
+
+
+def _mode_label(output_mode: str) -> str:
+    return {
+        "boss": "Boss 直聘简短自然版",
+        "formal": "正式平台稍正式版",
+        "intern": "实习/转岗友好版",
+    }.get(output_mode, "Boss 直聘简短自然版")
+
+
+def _extract_core_skills(job_tokens: set[str]) -> list[str]:
+    technical = {
+        "react", "typescript", "javascript", "python", "fastapi", "postgresql",
+        "sql", "api", "ai", "vue", "node", "next.js", "docker",
+    }
+    skills = [_display_keyword(token) for token in sorted(job_tokens) if token in technical]
+    return skills[:8] or ["从岗位描述中未识别到明确技术栈"]
+
+
+def _extract_business_contexts(job_description: str) -> list[str]:
+    contexts = [
+        keyword for keyword in [
+            "后台系统", "管理系统", "数据看板", "数据可视化", "接口联调",
+            "AI 工作流", "业务流程", "运营工具", "产品迭代",
+        ]
+        if keyword in job_description
+    ]
+    return contexts[:8] or ["岗位业务场景描述较少，建议面试前进一步确认"]
+
+
+def _extract_bonus_points(job_description: str) -> list[str]:
+    lines = [line.strip() for line in job_description.splitlines() if line.strip()]
+    bonus_lines = [
+        line for line in lines
+        if any(keyword in line for keyword in ("优先", "加分", "更佳", "熟悉", "了解"))
+    ]
+    return bonus_lines[:5] or ["暂无明确加分项，可重点补充岗位核心技能证据"]
+
+
+def _extract_hard_requirements(
+    job_description: str,
+    job_core_skills: list[str],
+) -> list[str]:
+    lines = [line.strip() for line in job_description.splitlines() if line.strip()]
+    hard_lines = [
+        line for line in lines
+        if any(keyword in line for keyword in ("要求", "必须", "需要", "负责", "岗位职责"))
+    ]
+    if hard_lines:
+        return hard_lines[:5]
+    return [f"需要体现 {skill} 相关经验" for skill in job_core_skills[:5]]
 
 
 def _dedupe_preserve_order(items: list[str]) -> list[str]:
@@ -215,7 +306,7 @@ def _has_cjk(text: str) -> bool:
 
 def result_to_record_payload(result: AnalysisResult, resume_text: str, job_description: str) -> dict:
     data = result.model_dump()
-    for key in ("strengths", "gaps", "recommendations", "rewritten_bullets", "ats_keywords", "edit_notes"):
+    for key in _LIST_FIELDS:
         data[key] = json.dumps(data[key], ensure_ascii=False)
     data["resume_text"] = resume_text
     data["job_description"] = job_description
@@ -224,6 +315,29 @@ def result_to_record_payload(result: AnalysisResult, resume_text: str, job_descr
 
 def record_to_result(record) -> dict:
     data = record.model_dump()
-    for key in ("strengths", "gaps", "recommendations", "rewritten_bullets", "ats_keywords", "edit_notes"):
+    for key in _LIST_FIELDS:
         data[key] = json.loads(data.get(key) or "[]")
     return data
+
+
+def _with_missing_structured_fields(result: AnalysisResult) -> AnalysisResult:
+    data = result.model_dump()
+    for field in _LIST_FIELDS:
+        data.setdefault(field, [])
+    return AnalysisResult.model_validate(data)
+
+
+_LIST_FIELDS = (
+    "strengths",
+    "gaps",
+    "recommendations",
+    "rewritten_bullets",
+    "ats_keywords",
+    "job_core_skills",
+    "job_business_contexts",
+    "job_bonus_points",
+    "job_hard_requirements",
+    "covered_keywords",
+    "missing_keywords",
+    "edit_notes",
+)

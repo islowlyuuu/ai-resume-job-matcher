@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   Copy,
+  Download,
   FileText,
   Lightbulb,
   ListChecks,
@@ -11,7 +12,7 @@ import {
   Tags,
   TriangleAlert
 } from "lucide-react";
-import { saveAnalysisSnapshot, type Analysis } from "@/lib/api";
+import { exportAnalysisUrl, saveAnalysisSnapshot, type Analysis } from "@/lib/api";
 import { ScoreRing } from "./score-ring";
 
 type AnalysisResultProps = {
@@ -47,6 +48,16 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
       setSaveError(caught instanceof Error ? caught.message : "保存失败，请稍后重试");
     }
   }
+
+  const resumeDraft = [
+    analysis.optimized_headline,
+    "",
+    analysis.optimized_summary,
+    "",
+    ...analysis.rewritten_bullets.map((item) => `- ${item}`),
+    "",
+    `关键词：${analysis.ats_keywords.join("、")}`,
+  ].join("\n");
 
   return (
     <section className="space-y-4">
@@ -127,6 +138,45 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-3">
+        <ActionButton
+          icon={<Copy className="h-4 w-4" />}
+          label="复制简历改写稿"
+          onClick={() => navigator.clipboard?.writeText(resumeDraft)}
+        />
+        <a
+          href={exportAnalysisUrl(analysis.id, "docx")}
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-[#ded7cf] bg-white px-3 text-sm font-semibold text-muted transition hover:border-copper hover:text-copper"
+        >
+          <Download className="h-4 w-4" />
+          导出 Word
+        </a>
+        <a
+          href={exportAnalysisUrl(analysis.id, "pdf")}
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-[#ded7cf] bg-white px-3 text-sm font-semibold text-muted transition hover:border-copper hover:text-copper"
+        >
+          <Download className="h-4 w-4" />
+          导出 PDF
+        </a>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-[#ded7cf] bg-[#fffdf9] shadow-[0_14px_42px_rgba(31,27,24,0.07)]">
+        <div className="border-b border-[#e8e1da] bg-[#fbf7f1] px-5 py-4">
+          <div className="flex items-center gap-2 text-ink">
+            <Tags className="h-5 w-5 text-copper" />
+            <h3 className="font-semibold">岗位解析</h3>
+          </div>
+        </div>
+        <div className="grid gap-4 p-5 lg:grid-cols-2">
+          <CompactList title="核心技能" items={analysis.job_core_skills} />
+          <CompactList title="业务场景" items={analysis.job_business_contexts} />
+          <CompactList title="加分项" items={analysis.job_bonus_points} />
+          <CompactList title="硬性要求" items={analysis.job_hard_requirements} />
+          <KeywordCompare title="已覆盖" items={analysis.covered_keywords} tone="covered" />
+          <KeywordCompare title="待补充" items={analysis.missing_keywords} tone="missing" />
         </div>
       </div>
 
@@ -228,6 +278,70 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
         </div>
       </div>
     </section>
+  );
+}
+
+function ActionButton({
+  icon,
+  label,
+  onClick
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-[#ded7cf] bg-white px-3 text-sm font-semibold text-muted transition hover:border-copper hover:text-copper"
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function CompactList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-lg border border-[#e4ddd5] bg-[#fbf7f1] p-4">
+      <h4 className="text-sm font-semibold text-ink">{title}</h4>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
+        {(items.length ? items : ["暂无明确识别结果"]).map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function KeywordCompare({
+  title,
+  items,
+  tone
+}: {
+  title: string;
+  items: string[];
+  tone: "covered" | "missing";
+}) {
+  return (
+    <div className="rounded-lg border border-[#e4ddd5] bg-[#fbf7f1] p-4">
+      <h4 className="text-sm font-semibold text-ink">{title}</h4>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(items.length ? items : ["暂无"]).map((item) => (
+          <span
+            key={item}
+            className={`rounded-md border px-2.5 py-1 text-xs font-medium ${
+              tone === "covered"
+                ? "border-[#d8dce4] bg-[#f6f7f9] text-[#5e6674]"
+                : "border-[#eaded6] bg-white text-copper"
+            }`}
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 

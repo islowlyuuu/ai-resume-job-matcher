@@ -8,7 +8,7 @@ import {
   RotateCcw,
   Sparkles
 } from "lucide-react";
-import { analyzeText, analyzeUpload, type Analysis } from "@/lib/api";
+import { analyzeText, analyzeUpload, type Analysis, type OutputMode } from "@/lib/api";
 
 type AnalyzerFormProps = {
   onAnalysis: (analysis: Analysis) => void;
@@ -23,6 +23,7 @@ const SAMPLE_JOB =
 export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);
   const [jobDescription, setJobDescription] = useState(SAMPLE_JOB);
+  const [outputMode, setOutputMode] = useState<OutputMode>("boss");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,8 +35,8 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
     try {
       const result = resumeFile
-        ? await analyzeUpload(resumeFile, jobDescription)
-        : await analyzeText(resumeText, jobDescription);
+        ? await analyzeUpload(resumeFile, jobDescription, outputMode)
+        : await analyzeText(resumeText, jobDescription, outputMode);
       onAnalysis(result);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "分析失败，请稍后重试");
@@ -62,6 +63,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           onClick={() => {
             setResumeText(SAMPLE_RESUME);
             setJobDescription(SAMPLE_JOB);
+            setOutputMode("boss");
             setResumeFile(null);
           }}
           className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#ded7cf] bg-white text-muted transition hover:border-copper hover:text-copper"
@@ -100,6 +102,27 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
       </div>
 
       <div className="shrink-0 space-y-2 border-t border-[#e8e1da] bg-[#fbf7f1] px-4 py-3">
+        <div>
+          <p className="mb-2 text-xs font-semibold text-ink">输出模式</p>
+          <div className="grid grid-cols-3 gap-1 rounded-md border border-[#ded7cf] bg-white p-1">
+            <ModeButton
+              active={outputMode === "boss"}
+              label="Boss"
+              onClick={() => setOutputMode("boss")}
+            />
+            <ModeButton
+              active={outputMode === "formal"}
+              label="正式"
+              onClick={() => setOutputMode("formal")}
+            />
+            <ModeButton
+              active={outputMode === "intern"}
+              label="实习"
+              onClick={() => setOutputMode("intern")}
+            />
+          </div>
+        </div>
+
         <label className="flex max-w-full cursor-pointer items-center gap-3 rounded-md border border-[#ded7cf] bg-white px-3 py-2 text-sm text-muted transition hover:border-copper hover:text-copper">
           <FileUp className="h-4 w-4 shrink-0" />
           <span className="shrink-0 rounded-md bg-[#f1e4dd] px-2.5 py-1 text-xs font-semibold text-copper">
@@ -136,5 +159,27 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
       {error ? <p className="px-4 pb-4 text-sm text-red-700">{error}</p> : null}
     </form>
+  );
+}
+
+function ModeButton({
+  active,
+  label,
+  onClick
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`min-h-8 rounded px-2 text-xs font-semibold transition ${
+        active ? "bg-[#2b2521] text-white" : "text-muted hover:bg-[#f8f3ee] hover:text-ink"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

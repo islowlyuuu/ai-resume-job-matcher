@@ -17,6 +17,12 @@ class AnalysisRecord(SQLModel, table=True):
     optimized_summary: str = Field(default="")
     rewritten_bullets: str = Field(default="[]")
     ats_keywords: str = Field(default="[]")
+    job_core_skills: str = Field(default="[]")
+    job_business_contexts: str = Field(default="[]")
+    job_bonus_points: str = Field(default="[]")
+    job_hard_requirements: str = Field(default="[]")
+    covered_keywords: str = Field(default="[]")
+    missing_keywords: str = Field(default="[]")
     edit_notes: str = Field(default="[]")
     cover_letter: str
     resume_text: str

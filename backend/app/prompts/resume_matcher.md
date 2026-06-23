@@ -12,6 +12,12 @@
 - optimized_summary: 面向目标岗位改写后的中文简历摘要
 - rewritten_bullets: 中文字符串数组，改写 3-6 条简历项目经历或工作经历 bullet
 - ats_keywords: 中文字符串数组，从岗位中提取、建议自然放入简历的关键词
+- job_core_skills: 中文字符串数组，岗位中的核心技能
+- job_business_contexts: 中文字符串数组，岗位涉及的业务场景
+- job_bonus_points: 中文字符串数组，岗位加分项
+- job_hard_requirements: 中文字符串数组，岗位硬性要求
+- covered_keywords: 中文字符串数组，简历已覆盖的岗位关键词
+- missing_keywords: 中文字符串数组，简历待补充证明的岗位关键词
 - edit_notes: 中文字符串数组，解释每处改写为什么更贴合岗位
 - cover_letter: 3 条 Boss 直聘开场白，用换行分隔
 

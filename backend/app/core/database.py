@@ -32,6 +32,12 @@ def _ensure_analysis_columns() -> None:
         "optimized_summary": "TEXT DEFAULT ''",
         "rewritten_bullets": "TEXT DEFAULT '[]'",
         "ats_keywords": "TEXT DEFAULT '[]'",
+        "job_core_skills": "TEXT DEFAULT '[]'",
+        "job_business_contexts": "TEXT DEFAULT '[]'",
+        "job_bonus_points": "TEXT DEFAULT '[]'",
+        "job_hard_requirements": "TEXT DEFAULT '[]'",
+        "covered_keywords": "TEXT DEFAULT '[]'",
+        "missing_keywords": "TEXT DEFAULT '[]'",
         "edit_notes": "TEXT DEFAULT '[]'",
     }
 

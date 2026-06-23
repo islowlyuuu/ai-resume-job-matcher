@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, History, Trash2 } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, History, Target, Trash2 } from "lucide-react";
 import { AnalysisResult } from "@/components/analysis-result";
 import { AnalyzerForm } from "@/components/analyzer-form";
 import { clearAnalyses, listAnalyses, type Analysis } from "@/lib/api";
@@ -31,29 +31,57 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-7xl px-4 py-6 md:px-8">
-      <header className="flex flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-clay">
-            AI Boss 投递助手
-          </p>
-          <h1 className="mt-2 max-w-3xl text-4xl font-semibold text-ink md:text-5xl">
-            根据 Boss 岗位要求，优化简历和第一句沟通话术。
-          </h1>
-        </div>
-        <div className="flex items-center gap-2 rounded-md border border-stone-300 bg-white/80 px-3 py-2 text-sm text-stone-700">
-          <BarChart3 className="h-4 w-4 text-moss" />
-          已保存 {history.length} 次分析
+    <main className="min-h-screen bg-[#f3f1ec] text-ink">
+      <header className="border-b border-stone-200 bg-white/90">
+        <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-md bg-ink text-white">
+              <BriefcaseBusiness className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-ink">AI Boss 投递助手</p>
+              <p className="text-sm text-stone-600">
+                JD 解析、简历改写、开场白生成
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="inline-flex items-center gap-2 rounded-md border border-stone-300 bg-paper px-3 py-2 text-stone-700">
+              <Target className="h-4 w-4 text-clay" />
+              Boss 投递场景
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-md border border-stone-300 bg-white px-3 py-2 text-stone-700">
+              <BarChart3 className="h-4 w-4 text-moss" />
+              已保存 {history.length} 次分析
+            </span>
+          </div>
         </div>
       </header>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
+      <div className="mx-auto grid w-full max-w-[1500px] gap-4 px-4 py-4 md:px-6 xl:grid-cols-[390px_minmax(0,1fr)_320px]">
+        <div className="xl:sticky xl:top-4 xl:h-[calc(100vh-2rem)] xl:overflow-auto">
           <AnalyzerForm onAnalysis={handleAnalysis} />
-          {activeAnalysis ? <AnalysisResult analysis={activeAnalysis} /> : null}
         </div>
 
-        <aside className="rounded-lg border border-stone-200 bg-white/95 p-5 shadow-sm xl:sticky xl:top-6 xl:h-fit">
+        <section className="min-w-0">
+          {activeAnalysis ? (
+            <AnalysisResult analysis={activeAnalysis} />
+          ) : (
+            <div className="grid min-h-[520px] place-items-center rounded-lg border border-dashed border-stone-300 bg-white/70 p-8 text-center">
+              <div>
+                <Target className="mx-auto h-10 w-10 text-clay" />
+                <h1 className="mt-4 text-2xl font-semibold text-ink">
+                  先粘贴简历和 Boss 岗位
+                </h1>
+                <p className="mt-3 max-w-md text-sm leading-6 text-stone-600">
+                  系统会生成匹配分、简历改写建议、ATS 关键词和 3 条更自然的 Boss 开场白。
+                </p>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <aside className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm xl:sticky xl:top-4 xl:h-fit">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <History className="h-5 w-5 text-clay" />
@@ -71,11 +99,11 @@ export default function Home() {
               </button>
             ) : null}
           </div>
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 space-y-2">
             {history.length === 0 ? (
-              <p className="text-sm leading-6 text-stone-600">
-                后端启动后，新的分析记录会显示在这里。
-              </p>
+              <div className="rounded-md bg-paper p-4 text-sm leading-6 text-stone-600">
+                新的分析记录会显示在这里，方便对比不同岗位。
+              </div>
             ) : (
               history.map((item) => (
                 <button

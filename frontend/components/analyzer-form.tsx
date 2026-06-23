@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ClipboardList, FileUp, Loader2, Send } from "lucide-react";
+import { ClipboardList, FileUp, Loader2, RotateCcw, Send } from "lucide-react";
 import { analyzeText, analyzeUpload, type Analysis } from "@/lib/api";
 
 type AnalyzerFormProps = {
@@ -41,21 +41,36 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-stone-200 bg-white/95 p-5 shadow-sm"
+      className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm"
     >
-      <div className="flex items-center gap-2">
-        <ClipboardList className="h-5 w-5 text-clay" />
-        <h2 className="text-lg font-semibold text-ink">岗位匹配与简历优化</h2>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="h-5 w-5 text-clay" />
+          <h2 className="text-lg font-semibold text-ink">投递材料</h2>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setResumeText(SAMPLE_RESUME);
+            setJobDescription(SAMPLE_JOB);
+            setResumeFile(null);
+          }}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-stone-300 text-stone-600 hover:border-clay hover:text-clay"
+          aria-label="恢复示例"
+          title="恢复示例"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </button>
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 space-y-4">
         <label className="block">
           <span className="text-sm font-medium text-stone-700">简历内容</span>
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
-            rows={10}
-            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-paper/60 p-3 text-sm outline-none ring-clay/30 focus:ring-4"
+            rows={9}
+            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
           />
         </label>
 
@@ -66,14 +81,14 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           <textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
-            rows={10}
+            rows={9}
             required
-            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-paper/60 p-3 text-sm outline-none ring-clay/30 focus:ring-4"
+            className="mt-2 w-full resize-y rounded-md border border-stone-300 bg-[#fbfaf7] p-3 text-sm leading-6 outline-none ring-clay/30 focus:ring-4"
           />
         </label>
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 border-t border-stone-200 pt-4 md:flex-row md:items-center md:justify-between">
+      <div className="mt-4 flex flex-col gap-3 border-t border-stone-200 pt-4">
         <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-stone-700">
           <FileUp className="h-4 w-4 text-moss" />
           <input
@@ -87,7 +102,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:bg-moss disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:bg-moss disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

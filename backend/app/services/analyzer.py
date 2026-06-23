@@ -66,6 +66,16 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         "把岗位中最核心的要求对应到可量化的项目成果上。",
         "项目经历建议同时写清技术工具、业务场景和最终结果。",
     ]
+    optimized_headline = _build_optimized_headline(job_title, overlap_labels)
+    optimized_summary = _build_optimized_summary(candidate_name, job_title, overlap_labels)
+    rewritten_bullets = _build_rewritten_bullets(overlap_labels, missing_labels)
+    ats_keywords = _dedupe_preserve_order([*overlap_labels, *missing_labels])[:12]
+    edit_notes = [
+        "把简历标题直接对齐目标岗位，方便招聘方快速判断方向匹配。",
+        "摘要优先突出岗位中反复出现的技能和业务场景。",
+        "项目经历改写为“动作 + 技术/场景 + 结果”的结构，更适合招聘筛选。",
+        "缺失关键词不建议硬塞，应结合真实项目补充证据。",
+    ]
 
     return AnalysisResult(
         candidate_name=candidate_name,
@@ -79,6 +89,11 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         strengths=strengths,
         gaps=gaps,
         recommendations=recommendations,
+        optimized_headline=optimized_headline,
+        optimized_summary=optimized_summary,
+        rewritten_bullets=rewritten_bullets,
+        ats_keywords=ats_keywords,
+        edit_notes=edit_notes,
         cover_letter=(
             "尊敬的招聘团队：\n\n"
             f"您好！我希望申请「{job_title}」岗位。我的经历与贵方在"
@@ -121,6 +136,51 @@ def _display_keyword(keyword: str) -> str:
     return display_map.get(keyword, keyword)
 
 
+def _build_optimized_headline(job_title: str, overlap_labels: list[str]) -> str:
+    focus = " / ".join(overlap_labels[:3]) if overlap_labels else "业务交付"
+    return f"{job_title}｜{focus} 方向"
+
+
+def _build_optimized_summary(
+    candidate_name: str,
+    job_title: str,
+    overlap_labels: list[str],
+) -> str:
+    focus = "、".join(overlap_labels[:5]) if overlap_labels else "项目交付、跨团队协作和问题解决"
+    return (
+        f"{candidate_name}具备面向「{job_title}」的相关项目经验，"
+        f"能够围绕{focus}推进需求落地。建议在正式简历中补充可量化结果，"
+        "例如性能提升、效率提升、转化提升、成本下降或交付周期缩短。"
+    )
+
+
+def _build_rewritten_bullets(
+    overlap_labels: list[str],
+    missing_labels: list[str],
+) -> list[str]:
+    primary = overlap_labels[:4] or ["核心技能"]
+    bullets = [
+        f"围绕目标岗位要求，使用{primary[0]}完成核心模块建设，并沉淀可复用的实现方案。",
+        f"结合{', '.join(primary[:3])}等技术或能力，优化业务流程，提升团队协作和交付效率。",
+        "将项目经历按业务背景、个人职责、关键动作和结果影响重写，突出与岗位职责的直接关联。",
+    ]
+    if missing_labels:
+        bullets.append(
+            f"针对岗位提到的{missing_labels[0]}，补充真实项目中的使用场景、产出和复盘。"
+        )
+    return bullets
+
+
+def _dedupe_preserve_order(items: list[str]) -> list[str]:
+    seen = set()
+    deduped = []
+    for item in items:
+        if item and item not in seen:
+            seen.add(item)
+            deduped.append(item)
+    return deduped
+
+
 def _guess_job_title(job_description: str) -> str:
     first_line = next((line.strip() for line in job_description.splitlines() if line.strip()), "")
     if len(first_line.split()) <= 8:
@@ -150,7 +210,7 @@ def _has_cjk(text: str) -> bool:
 
 def result_to_record_payload(result: AnalysisResult, resume_text: str, job_description: str) -> dict:
     data = result.model_dump()
-    for key in ("strengths", "gaps", "recommendations"):
+    for key in ("strengths", "gaps", "recommendations", "rewritten_bullets", "ats_keywords", "edit_notes"):
         data[key] = json.dumps(data[key], ensure_ascii=False)
     data["resume_text"] = resume_text
     data["job_description"] = job_description
@@ -159,6 +219,6 @@ def result_to_record_payload(result: AnalysisResult, resume_text: str, job_descr
 
 def record_to_result(record) -> dict:
     data = record.model_dump()
-    for key in ("strengths", "gaps", "recommendations"):
-        data[key] = json.loads(data[key])
+    for key in ("strengths", "gaps", "recommendations", "rewritten_bullets", "ats_keywords", "edit_notes"):
+        data[key] = json.loads(data.get(key) or "[]")
     return data

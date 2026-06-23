@@ -7,6 +7,11 @@ export type Analysis = {
   strengths: string[];
   gaps: string[];
   recommendations: string[];
+  optimized_headline: string;
+  optimized_summary: string;
+  rewritten_bullets: string[];
+  ats_keywords: string[];
+  edit_notes: string[];
   cover_letter: string;
   created_at: string;
 };

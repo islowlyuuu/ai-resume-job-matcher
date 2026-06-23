@@ -45,7 +45,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
     >
       <div className="flex items-center gap-2">
         <ClipboardList className="h-5 w-5 text-clay" />
-        <h2 className="text-lg font-semibold text-ink">岗位匹配分析</h2>
+        <h2 className="text-lg font-semibold text-ink">岗位匹配与简历优化</h2>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
@@ -94,7 +94,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           ) : (
             <Send className="h-4 w-4" />
           )}
-          开始分析
+          生成优化方案
         </button>
       </div>
 

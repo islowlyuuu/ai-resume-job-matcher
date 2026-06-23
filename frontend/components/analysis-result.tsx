@@ -1,4 +1,12 @@
-import { CheckCircle2, FileText, Lightbulb, TriangleAlert } from "lucide-react";
+import {
+  CheckCircle2,
+  FileText,
+  Lightbulb,
+  ListChecks,
+  Sparkles,
+  Tags,
+  TriangleAlert
+} from "lucide-react";
 import type { Analysis } from "@/lib/api";
 import { ScoreRing } from "./score-ring";
 
@@ -24,6 +32,47 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
         </div>
       </div>
 
+      <div className="rounded-lg border border-stone-200 bg-white/90 p-5 shadow-sm">
+        <div className="flex items-center gap-2 text-ink">
+          <Sparkles className="h-5 w-5 text-clay" />
+          <h3 className="font-semibold">优化后的简历版本</h3>
+        </div>
+        <div className="mt-4 rounded-md bg-paper/70 p-4">
+          <p className="text-sm font-semibold text-moss">推荐标题</p>
+          <p className="mt-2 text-xl font-semibold text-ink">
+            {analysis.optimized_headline}
+          </p>
+          <p className="mt-4 text-sm font-semibold text-moss">推荐摘要</p>
+          <p className="mt-2 text-sm leading-6 text-stone-700">
+            {analysis.optimized_summary}
+          </p>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_320px]">
+          <InsightList
+            icon={<ListChecks className="h-5 w-5" />}
+            title="改写后的经历要点"
+            items={analysis.rewritten_bullets}
+          />
+          <div className="rounded-lg border border-stone-200 bg-white p-5">
+            <div className="flex items-center gap-2 text-clay">
+              <Tags className="h-5 w-5" />
+              <h3 className="font-semibold text-ink">ATS 关键词</h3>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {analysis.ats_keywords.map((keyword) => (
+                <span
+                  key={keyword}
+                  className="rounded-md border border-stone-200 bg-paper px-2.5 py-1 text-xs font-medium text-stone-700"
+                >
+                  {keyword}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <InsightList
           icon={<CheckCircle2 className="h-5 w-5" />}
@@ -41,6 +90,12 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
           items={analysis.recommendations}
         />
       </div>
+
+      <InsightList
+        icon={<Sparkles className="h-5 w-5" />}
+        title="改写说明"
+        items={analysis.edit_notes}
+      />
 
       <div className="rounded-lg border border-stone-200 bg-white/90 p-5 shadow-sm">
         <div className="flex items-center gap-2 text-ink">

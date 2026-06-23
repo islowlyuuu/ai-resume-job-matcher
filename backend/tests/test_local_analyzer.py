@@ -15,3 +15,7 @@ def test_local_analyzer_returns_score_without_openai_key(monkeypatch):
     assert result.match_score >= 50
     assert result.candidate_name == "张明"
     assert result.strengths
+    assert result.optimized_headline
+    assert result.optimized_summary
+    assert result.rewritten_bullets
+    assert result.ats_keywords

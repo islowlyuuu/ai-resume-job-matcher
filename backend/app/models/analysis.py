@@ -13,6 +13,11 @@ class AnalysisRecord(SQLModel, table=True):
     strengths: str
     gaps: str
     recommendations: str
+    optimized_headline: str = Field(default="")
+    optimized_summary: str = Field(default="")
+    rewritten_bullets: str = Field(default="[]")
+    ats_keywords: str = Field(default="[]")
+    edit_notes: str = Field(default="[]")
     cover_letter: str
     resume_text: str
     job_description: str

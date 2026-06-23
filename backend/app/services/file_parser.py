@@ -13,10 +13,8 @@ async def extract_text(file: UploadFile) -> str:
         return _extract_pdf(content)
     if filename.lower().endswith(".docx"):
         return _extract_docx(content)
-    if filename.lower().endswith(".txt"):
-        return content.decode("utf-8", errors="ignore")
 
-    raise ValueError("Unsupported file type. Upload PDF, DOCX, or TXT.")
+    raise ValueError("Unsupported file type. Upload PDF or Word DOCX.")
 
 
 def _extract_pdf(content: bytes) -> str:

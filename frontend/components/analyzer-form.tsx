@@ -84,7 +84,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
-            placeholder="粘贴你当前简历，或者上传 PDF / DOCX"
+            placeholder="粘贴你当前简历，或者上传 PDF / Word"
             className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
@@ -109,7 +109,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           <FileUp className="h-4 w-4 shrink-0 text-copper" />
           <input
             type="file"
-            accept=".pdf,.docx,.txt"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
             className="min-w-0 max-w-64 text-sm"
           />

@@ -1,7 +1,14 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ClipboardList, FileUp, Loader2, RotateCcw, Sparkles } from "lucide-react";
+import {
+  ClipboardList,
+  FileUp,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  TextCursorInput
+} from "lucide-react";
 import { analyzeText, analyzeUpload, type Analysis } from "@/lib/api";
 
 type AnalyzerFormProps = {
@@ -41,14 +48,16 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-full min-h-[640px] flex-col rounded-xl border border-stone-200 bg-white p-4 shadow-sm xl:min-h-0"
+      className="flex h-full min-h-[640px] flex-col overflow-hidden rounded-lg border border-[#ded7cf] bg-[#fffdfa] shadow-[0_14px_42px_rgba(31,27,24,0.08)] xl:min-h-0"
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 border-b border-[#e8e1da] bg-[#fbf7f1] px-5 py-4">
         <div className="flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-[#b46a55]" />
+          <span className="grid h-9 w-9 place-items-center rounded-md bg-[#2b2521] text-white">
+            <ClipboardList className="h-5 w-5" />
+          </span>
           <div>
             <h2 className="text-base font-semibold text-ink">投递材料</h2>
-            <p className="text-xs text-stone-500">把 Boss JD 和真实经历放进来</p>
+            <p className="text-xs text-muted">简历经历 + Boss 岗位原文</p>
           </div>
         </div>
         <button
@@ -58,7 +67,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             setJobDescription(SAMPLE_JOB);
             setResumeFile(null);
           }}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-stone-200 text-stone-500 hover:border-[#c58a7a] hover:text-[#9f5746]"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#ded7cf] bg-white text-muted transition hover:border-copper hover:text-copper"
           aria-label="恢复示例"
           title="恢复示例"
         >
@@ -66,44 +75,50 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 grid min-h-0 flex-1 grid-rows-2 gap-4">
+      <div className="grid min-h-0 flex-1 grid-rows-2 gap-4 px-5 py-5">
         <label className="flex min-h-0 flex-col">
-          <span className="text-sm font-medium text-stone-700">简历内容</span>
+          <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+            <TextCursorInput className="h-4 w-4 text-copper" />
+            简历内容
+          </span>
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-lg border border-stone-200 bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-[#c58a7a]/30 focus:ring-4"
+            placeholder="粘贴你当前简历，或者上传 PDF / DOCX"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
 
         <label className="flex min-h-0 flex-col">
-          <span className="text-sm font-medium text-stone-700">
+          <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+            <TextCursorInput className="h-4 w-4 text-copper" />
             岗位描述
           </span>
           <textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
             required
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-lg border border-stone-200 bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-[#c58a7a]/30 focus:ring-4"
+            placeholder="粘贴 Boss 岗位要求、任职资格、加分项"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
       </div>
 
-      <div className="mt-4 shrink-0 space-y-3 border-t border-stone-200 pt-4">
-        <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-stone-600">
-          <FileUp className="h-4 w-4 text-[#b46a55]" />
+      <div className="shrink-0 space-y-3 border-t border-[#e8e1da] bg-[#fbf7f1] px-5 py-4">
+        <label className="inline-flex max-w-full cursor-pointer items-center gap-2 text-sm text-muted">
+          <FileUp className="h-4 w-4 shrink-0 text-copper" />
           <input
             type="file"
             accept=".pdf,.docx,.txt"
             onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
-            className="max-w-64 text-sm"
+            className="min-w-0 max-w-64 text-sm"
           />
         </label>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#2a2522] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#403833] disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#2b2521] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(31,27,24,0.18)] transition hover:bg-[#3b322d] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -115,11 +130,11 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
       </div>
 
       {resumeFile ? (
-        <p className="mt-3 text-xs text-stone-500">
+        <p className="px-5 pb-4 text-xs text-muted">
           当前使用上传文件进行分析：{resumeFile.name}
         </p>
       ) : null}
-      {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="px-5 pb-4 text-sm text-red-700">{error}</p> : null}
     </form>
   );
 }

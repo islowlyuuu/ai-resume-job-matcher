@@ -15,10 +15,10 @@ type AnalyzerFormProps = {
 };
 
 const SAMPLE_RESUME =
-  "张明\n前端/全栈开发\n参与过后台管理系统、数据看板和接口联调开发，主要使用 React、TypeScript、FastAPI 和 PostgreSQL。";
+  "张明\n前端/全栈开发\n参与后台管理系统、数据看板和接口联调，主要使用 React、TypeScript、FastAPI 和 PostgreSQL。";
 
 const SAMPLE_JOB =
-  "Boss 岗位：前端开发工程师\n岗位要求：熟悉 React、TypeScript，有后台系统、数据可视化、接口联调经验，了解后端开发优先。";
+  "前端开发工程师\n要求熟悉 React、TypeScript，有后台系统、数据可视化、接口联调经验，了解后端开发优先。";
 
 export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);
@@ -81,7 +81,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
             placeholder="粘贴你当前简历，或者上传 PDF / Word"
-            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
+            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-[13px] leading-5 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
 
@@ -94,24 +94,30 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             onChange={(event) => setJobDescription(event.target.value)}
             required
             placeholder="粘贴 Boss 岗位要求、任职资格、加分项"
-            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-sm leading-6 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
+            className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-[13px] leading-5 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
         </label>
       </div>
 
-      <div className="shrink-0 space-y-3 border-t border-[#e8e1da] bg-[#fbf7f1] px-4 py-4">
-        <label className="flex max-w-full cursor-pointer items-center gap-2 rounded-md border border-[#ded7cf] bg-white px-3 py-2 text-sm text-muted transition hover:border-copper hover:text-copper">
+      <div className="shrink-0 space-y-2 border-t border-[#e8e1da] bg-[#fbf7f1] px-4 py-3">
+        <label className="flex max-w-full cursor-pointer items-center gap-3 rounded-md border border-[#ded7cf] bg-white px-3 py-2 text-sm text-muted transition hover:border-copper hover:text-copper">
           <FileUp className="h-4 w-4 shrink-0" />
+          <span className="shrink-0 rounded-md bg-[#f1e4dd] px-2.5 py-1 text-xs font-semibold text-copper">
+            选择文件
+          </span>
+          <span className="min-w-0 flex-1 truncate">
+            {resumeFile ? resumeFile.name : "未选择任何文件"}
+          </span>
           <input
             type="file"
             accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
-            className="min-w-0 flex-1 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-[#f1e4dd] file:px-2.5 file:py-1.5 file:text-xs file:font-semibold file:text-copper"
+            className="sr-only"
           />
         </label>
         <p className="flex items-start gap-2 text-xs leading-5 text-muted">
           <BadgeInfo className="mt-0.5 h-3.5 w-3.5 shrink-0 text-copper" />
-          <span>仅支持 PDF 和 Word（.docx）格式；也可以直接粘贴简历内容。</span>
+          <span>仅支持 PDF / Word（.docx），也可以直接粘贴。</span>
         </p>
 
         <button
@@ -128,11 +134,6 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         </button>
       </div>
 
-      {resumeFile ? (
-        <p className="px-4 pb-4 text-xs text-muted">
-          当前使用上传文件进行分析：{resumeFile.name}
-        </p>
-      ) : null}
       {error ? <p className="px-4 pb-4 text-sm text-red-700">{error}</p> : null}
     </form>
   );

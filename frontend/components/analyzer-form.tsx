@@ -41,12 +41,12 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-full min-h-[640px] flex-col rounded-lg bg-[#121912] p-4 text-white shadow-sm xl:min-h-0"
+      className="flex h-full min-h-[640px] flex-col rounded-lg border border-stone-200 bg-white p-3 shadow-sm xl:min-h-0"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-clay" />
-          <h2 className="text-lg font-semibold">投递材料</h2>
+          <ClipboardList className="h-5 w-5 text-[#5f8c6c]" />
+          <h2 className="text-base font-semibold text-ink">投递材料</h2>
         </div>
         <button
           type="button"
@@ -55,7 +55,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             setJobDescription(SAMPLE_JOB);
             setResumeFile(null);
           }}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/15 text-stone-300 hover:border-clay hover:text-white"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-stone-200 text-stone-500 hover:border-[#8fb199] hover:text-[#5f8c6c]"
           aria-label="恢复示例"
           title="恢复示例"
         >
@@ -65,30 +65,30 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
       <div className="mt-4 grid min-h-0 flex-1 grid-rows-2 gap-4">
         <label className="flex min-h-0 flex-col">
-          <span className="text-sm font-medium text-stone-200">简历内容</span>
+          <span className="text-sm font-medium text-stone-700">简历内容</span>
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-white/10 bg-white/95 p-3 text-sm leading-6 text-ink outline-none ring-clay/30 focus:ring-4"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-stone-200 bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-[#8fb199]/30 focus:ring-4"
           />
         </label>
 
         <label className="flex min-h-0 flex-col">
-          <span className="text-sm font-medium text-stone-200">
+          <span className="text-sm font-medium text-stone-700">
             岗位描述
           </span>
           <textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
             required
-            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-white/10 bg-white/95 p-3 text-sm leading-6 text-ink outline-none ring-clay/30 focus:ring-4"
+            className="mt-2 min-h-44 flex-1 resize-none overflow-auto rounded-md border border-stone-200 bg-[#fbfaf7] p-3 text-sm leading-6 text-ink outline-none ring-[#8fb199]/30 focus:ring-4"
           />
         </label>
       </div>
 
-      <div className="mt-4 shrink-0 space-y-3 border-t border-white/10 pt-4">
-        <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-stone-300">
-          <FileUp className="h-4 w-4 text-moss" />
+      <div className="mt-4 shrink-0 space-y-3 border-t border-stone-200 pt-4">
+        <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-stone-600">
+          <FileUp className="h-4 w-4 text-[#5f8c6c]" />
           <input
             type="file"
             accept=".pdf,.docx,.txt"
@@ -100,7 +100,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-clay px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#9f4e32] disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#2f5d41] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#264a35] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

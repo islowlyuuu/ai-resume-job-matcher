@@ -23,7 +23,7 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
 
   return (
     <section className="space-y-4">
-      <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+      <div className="rounded-lg border border-stone-300 bg-[#f8f6f1] p-5">
         <div className="grid gap-5 lg:grid-cols-[120px_minmax(0,1fr)]">
           <ScoreRing score={analysis.match_score} />
           <div className="min-w-0">
@@ -45,7 +45,7 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
               {analysis.ats_keywords.slice(0, 8).map((keyword) => (
                 <span
                   key={keyword}
-                  className="rounded-md border border-stone-200 bg-[#fbfaf7] px-2.5 py-1 text-xs font-medium text-stone-700"
+                  className="rounded-md border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700"
                 >
                   {keyword}
                 </span>
@@ -55,42 +55,46 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-2 text-ink">
-          <Sparkles className="h-5 w-5 text-clay" />
-          <h3 className="font-semibold">优化后的简历版本</h3>
+      <div className="overflow-hidden rounded-lg border border-stone-300 bg-white">
+        <div className="border-b border-stone-200 bg-[#f8f6f1] px-5 py-4">
+          <div className="flex items-center gap-2 text-ink">
+            <Sparkles className="h-5 w-5 text-clay" />
+            <h3 className="font-semibold">简历改写稿</h3>
+          </div>
         </div>
-        <div className="mt-4 rounded-md border border-stone-200 bg-[#fbfaf7] p-4">
-          <p className="text-sm font-semibold text-moss">推荐标题</p>
-          <p className="mt-2 text-xl font-semibold text-ink">
-            {analysis.optimized_headline}
-          </p>
-          <p className="mt-4 text-sm font-semibold text-moss">推荐摘要</p>
-          <p className="mt-2 text-sm leading-6 text-stone-700">
-            {analysis.optimized_summary}
-          </p>
-        </div>
+        <div className="p-5">
+          <div className="border-l-4 border-clay bg-[#fbfaf7] p-4">
+            <p className="text-xs font-semibold uppercase text-moss">推荐标题</p>
+            <p className="mt-2 text-xl font-semibold text-ink">
+              {analysis.optimized_headline}
+            </p>
+            <p className="mt-4 text-xs font-semibold uppercase text-moss">推荐摘要</p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {analysis.optimized_summary}
+            </p>
+          </div>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <InsightList
-            icon={<ListChecks className="h-5 w-5" />}
-            title="改写后的经历要点"
-            items={analysis.rewritten_bullets}
-          />
-          <div className="rounded-lg border border-stone-200 bg-white p-4">
-            <div className="flex items-center gap-2 text-clay">
-              <Tags className="h-5 w-5" />
-              <h3 className="font-semibold text-ink">ATS 关键词</h3>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {analysis.ats_keywords.map((keyword) => (
-                <span
-                  key={keyword}
-                  className="rounded-md border border-stone-200 bg-paper px-2.5 py-1 text-xs font-medium text-stone-700"
-                >
-                  {keyword}
-                </span>
-              ))}
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_300px]">
+            <InsightList
+              icon={<ListChecks className="h-5 w-5" />}
+              title="改写后的经历要点"
+              items={analysis.rewritten_bullets}
+            />
+            <div className="rounded-md border border-stone-300 bg-[#f8f6f1] p-4">
+              <div className="flex items-center gap-2 text-clay">
+                <Tags className="h-5 w-5" />
+                <h3 className="font-semibold text-ink">ATS 关键词</h3>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {analysis.ats_keywords.map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="rounded-md border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700"
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -120,8 +124,8 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
         items={analysis.edit_notes}
       />
 
-      <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-2 text-ink">
+      <div className="rounded-lg border border-stone-300 bg-[#121912] p-5 text-white">
+        <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-clay" />
           <h3 className="font-semibold">Boss 开场白</h3>
         </div>
@@ -129,9 +133,9 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
           {openers.map((opener, index) => (
             <div
               key={opener}
-              className="flex gap-3 rounded-md border border-stone-200 bg-[#fbfaf7] p-3"
+              className="flex gap-3 rounded-md border border-white/10 bg-white/95 p-3 text-ink"
             >
-              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-ink text-xs font-semibold text-white">
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-clay text-xs font-semibold text-white">
                 {index + 1}
               </span>
               <p className="flex-1 text-sm leading-6 text-stone-800">{opener}</p>
@@ -162,7 +166,7 @@ function InsightList({
   items: string[];
 }) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+    <div className="rounded-lg border border-stone-300 bg-[#f8f6f1] p-4">
       <div className="flex items-center gap-2 text-clay">
         {icon}
         <h3 className="font-semibold text-ink">{title}</h3>

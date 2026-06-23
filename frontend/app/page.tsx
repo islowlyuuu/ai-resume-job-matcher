@@ -35,10 +35,10 @@ export default function Home() {
       <header className="flex flex-col gap-4 py-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-clay">
-            AI 简历岗位匹配助手
+            AI Boss 投递助手
           </p>
           <h1 className="mt-2 max-w-3xl text-4xl font-semibold text-ink md:text-5xl">
-            让每一份简历都更贴近目标岗位。
+            根据 Boss 岗位要求，优化简历和第一句沟通话术。
           </h1>
         </div>
         <div className="flex items-center gap-2 rounded-md border border-stone-300 bg-white/80 px-3 py-2 text-sm text-stone-700">

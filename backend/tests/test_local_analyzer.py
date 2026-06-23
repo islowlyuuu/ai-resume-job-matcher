@@ -19,3 +19,6 @@ def test_local_analyzer_returns_score_without_openai_key(monkeypatch):
     assert result.optimized_summary
     assert result.rewritten_bullets
     assert result.ats_keywords
+    assert "尊敬" not in result.cover_letter
+    assert "此致" not in result.cover_letter
+    assert "您好" in result.cover_letter

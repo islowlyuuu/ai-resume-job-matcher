@@ -100,7 +100,7 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
       <div className="rounded-lg border border-stone-200 bg-white/90 p-5 shadow-sm">
         <div className="flex items-center gap-2 text-ink">
           <FileText className="h-5 w-5 text-clay" />
-          <h3 className="font-semibold">求职信草稿</h3>
+          <h3 className="font-semibold">Boss 开场白</h3>
         </div>
         <pre className="mt-4 whitespace-pre-wrap rounded-md bg-stone-100 p-4 text-sm leading-6 text-stone-800">
           {analysis.cover_letter}

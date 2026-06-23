@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "AI 简历岗位匹配助手"
+    app_name: str = "AI Boss 投递助手"
     database_url: str = "sqlite:///./resume_matcher.db"
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"

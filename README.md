@@ -1,24 +1,37 @@
-# AI 简历岗位匹配助手
+# AI Boss 投递助手
 
-一个 AI 全栈项目：用户可以粘贴或上传简历，再输入目标岗位描述，系统会自动分析简历与岗位的匹配度，并根据岗位要求生成一版更贴合目标岗位的简历优化方案。
+一个面向国内 Boss 直聘求职场景的 AI 全栈项目。用户可以粘贴或上传简历，再粘贴 Boss 岗位描述，系统会自动分析岗位要求、优化简历表达、生成自然的第一句沟通话术，并保存分析历史。
 
-这个项目适合用于 GitHub 展示，包含可用的前端界面、FastAPI 后端、数据库持久化、文件解析、可选 OpenAI 接入、Docker 配置、测试和完整启动说明。
+项目目标不是写一封很正式的求职信，而是帮助求职者在 Boss 投递时更快完成三件事：看懂岗位、改好简历、发出不尴尬的开场白。
 
 ## 功能
 
 - 支持粘贴简历文本
 - 支持上传 PDF、DOCX、TXT 简历文件
-- 支持输入任意岗位描述
-- 自动生成岗位匹配分数、总结、匹配优势、能力差距和优化建议
+- 支持粘贴 Boss 岗位 JD
+- 自动生成岗位匹配分数、匹配优势、能力差距和优化建议
 - 根据岗位要求生成优化后的简历标题和个人摘要
 - 自动改写工作经历 / 项目经历 bullet
 - 提取适合放入简历的 ATS 关键词
-- 解释每处改写为什么更贴合目标岗位
-- 自动生成中文求职信草稿
-- 默认使用 SQLite 保存历史分析记录
+- 生成 3 条自然、简短、低 AI 味的 Boss 开场白
+- 保存和清空本地分析历史
 - 未配置 OpenAI API Key 时，使用本地关键词分析器，方便直接演示
 - 配置 `OPENAI_API_KEY` 后，自动切换到 OpenAI 模型分析
-- 提供 Docker Compose 本地一键启动方案
+
+## Boss 开场白风格
+
+项目会避免生成下面这种正式求职信：
+
+```txt
+尊敬的招聘团队：
+您好！我希望申请贵公司的岗位……
+```
+
+更适合 Boss 的输出是：
+
+```txt
+您好，我有 React 和后台系统开发经验，感觉和岗位要求比较匹配，想沟通下这个机会。
+```
 
 ## 技术栈
 
@@ -34,7 +47,7 @@
 ```txt
 浏览器
   |
-  | Next.js 界面
+  | Next.js 求职工作台
   v
 Frontend :3000
   |
@@ -51,26 +64,6 @@ SQLite 数据库
 OpenAI API
 ```
 
-## 项目结构
-
-```txt
-ai-resume-job-matcher/
-  backend/
-    app/
-      api/          # API 路由
-      core/         # 配置和数据库
-      models/       # 数据表模型
-      prompts/      # AI Prompt
-      schemas/      # 请求和响应结构
-      services/     # 业务逻辑
-    tests/
-  frontend/
-    app/
-    components/
-    lib/
-  docker-compose.yml
-```
-
 ## 本地启动
 
 ### 1. 启动后端
@@ -82,12 +75,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
-```
-
-后端地址：
-
-```txt
-http://localhost:8000
 ```
 
 API 文档：
@@ -112,8 +99,6 @@ http://localhost:3000
 ```
 
 ## Docker 启动
-
-先创建环境变量文件：
 
 ```bash
 cp backend/.env.example backend/.env
@@ -148,8 +133,8 @@ OPENAI_MODEL="gpt-4o-mini"
 curl -X POST http://localhost:8000/api/analyses/text \
   -H "Content-Type: application/json" \
   -d '{
-    "resume_text": "张明\n全栈工程师，熟悉 React、FastAPI、PostgreSQL 和数据看板开发。",
-    "job_description": "高级全栈工程师，需要 React、FastAPI、PostgreSQL、AI 产品和数据看板经验。"
+    "resume_text": "张明\n前端开发，熟悉 React、TypeScript、后台系统和数据看板开发。",
+    "job_description": "Boss 岗位：前端开发工程师\n要求熟悉 React、TypeScript，有后台系统和数据可视化经验。"
   }'
 ```
 
@@ -160,15 +145,25 @@ cd backend
 pytest
 ```
 
+## 简历项目描述参考
+
+```txt
+AI Boss 投递助手：面向国内 Boss 直聘求职场景的 AI 全栈应用，支持岗位 JD 解析、简历定向优化、自然开场白生成和投递分析历史管理。
+```
+
+```txt
+- 使用 Next.js、TypeScript 和 Tailwind CSS 构建响应式求职工作台，支持简历输入、岗位 JD 分析和优化结果展示。
+- 基于 FastAPI、SQLModel 和 SQLite 实现简历分析记录、文件解析和历史管理接口。
+- 设计低 AI 感 Prompt，生成 30-60 字 Boss 开场白，避免正式求职信和模板化表达。
+- 根据岗位要求提取技能关键词、匹配差距和简历优化方向，生成可直接用于简历修改的摘要和经历 bullet。
+```
+
 ## 后续规划
 
-- 增加登录系统和按用户隔离的分析历史
-- 增加 PostgreSQL 生产环境配置
-- 增加更细的评分维度，例如技能、经验年限、行业匹配、项目影响力
-- 增加分析结果 PDF 导出
-- 增加可编辑简历模板，一键导出优化后的 Word / PDF 简历
-- 增加 RAG，用历史简历和岗位记录做个性化建议
-- 增加 CI，自动运行后端测试和前端构建
+- 增加投递记录管理：公司、岗位、链接、状态、备注
+- 增加面试准备：根据 JD 生成面试题和回答思路
+- 增加可编辑简历模板，一键导出 Word / PDF 简历
+- 增加数据看板，统计投递数量、沟通率、面试率
 
 ## License
 

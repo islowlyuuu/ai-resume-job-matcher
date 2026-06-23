@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI 简历岗位匹配助手",
-  description: "使用 AI 分析简历与岗位描述的匹配度。"
+  title: "AI Boss 投递助手",
+  description: "根据 Boss 岗位描述优化简历和开场白。"
 };
 
 export default function RootLayout({

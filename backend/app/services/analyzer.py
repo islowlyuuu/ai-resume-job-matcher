@@ -94,14 +94,7 @@ def _analyze_locally(resume_text: str, job_description: str) -> AnalysisResult:
         rewritten_bullets=rewritten_bullets,
         ats_keywords=ats_keywords,
         edit_notes=edit_notes,
-        cover_letter=(
-            "尊敬的招聘团队：\n\n"
-            f"您好！我希望申请「{job_title}」岗位。我的经历与贵方在"
-            f"「{'、'.join(overlap_labels[:3]) or '核心岗位职责'}」方面的要求较为匹配，"
-            "也期待有机会把相关项目经验和解决问题的能力带到团队中。\n\n"
-            "此致\n"
-            f"{candidate_name}"
-        ),
+        cover_letter=_build_boss_openers(job_title, overlap_labels),
     )
 
 
@@ -109,11 +102,11 @@ def _keywords(text: str) -> set[str]:
     stop_words = {
         "and", "for", "with", "the", "you", "your", "are", "that", "this", "from",
         "will", "have", "has", "our", "their", "role", "team", "work", "years",
-        "experience", "candidate", "responsibilities", "requirements",
+        "experience", "candidate", "responsibilities", "requirements", "boss",
     }
     cn_keywords = {
         "全栈", "前端", "后端", "数据看板", "看板", "数据库", "自动化测试",
-        "测试", "产品", "工程师", "项目", "运营", "工作流", "简历", "岗位",
+        "测试", "产品", "项目", "运营", "工作流", "接口联调", "数据可视化",
     }
     words = re.findall(r"[a-zA-Z][a-zA-Z+#.-]{2,}", text.lower())
     tokens = {word.strip(".,;:!?") for word in words if word not in stop_words}
@@ -171,6 +164,17 @@ def _build_rewritten_bullets(
     return bullets
 
 
+def _build_boss_openers(job_title: str, overlap_labels: list[str]) -> str:
+    focus = "、".join(overlap_labels[:3]) if overlap_labels else "岗位方向"
+    return "\n".join(
+        [
+            f"您好，我看了这个{job_title}岗位，和我之前做的{focus}方向比较接近，想进一步了解一下。",
+            f"您好，我有{focus}相关经验，感觉和岗位要求比较匹配，想沟通下这个机会。",
+            f"您好，这个岗位方向我比较感兴趣，我之前有{focus}相关经历，方便的话想了解下团队情况。",
+        ]
+    )
+
+
 def _dedupe_preserve_order(items: list[str]) -> list[str]:
     seen = set()
     deduped = []
@@ -183,6 +187,7 @@ def _dedupe_preserve_order(items: list[str]) -> list[str]:
 
 def _guess_job_title(job_description: str) -> str:
     first_line = next((line.strip() for line in job_description.splitlines() if line.strip()), "")
+    first_line = re.sub(r"^(Boss\s*)?岗位[:：]\s*", "", first_line, flags=re.IGNORECASE)
     if len(first_line.split()) <= 8:
         return first_line if _has_cjk(first_line) else first_line.title()
     patterns = [r"(?:hiring|seeking|looking for)\s+(?:an?\s+)?([^.,\n]+)"]

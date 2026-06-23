@@ -9,10 +9,10 @@ type AnalyzerFormProps = {
 };
 
 const SAMPLE_RESUME =
-  "张明\n全栈工程师\n负责搭建 React 数据看板、FastAPI 后端服务、PostgreSQL 数据模型，并为运营团队开发 AI 工作流工具。";
+  "张明\n前端/全栈开发\n参与过后台管理系统、数据看板和接口联调开发，主要使用 React、TypeScript、FastAPI 和 PostgreSQL。";
 
 const SAMPLE_JOB =
-  "高级全栈工程师\n我们需要一名熟悉 React、FastAPI、PostgreSQL、AI 产品、自动化测试和数据看板设计的工程师。";
+  "Boss 岗位：前端开发工程师\n岗位要求：熟悉 React、TypeScript，有后台系统、数据可视化、接口联调经验，了解后端开发优先。";
 
 export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);

@@ -8,3 +8,5 @@ node_modules/
 dist/
 build/
 .DS_Store
+change_snapshots/*.md
+!change_snapshots/README.md

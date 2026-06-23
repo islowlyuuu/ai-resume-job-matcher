@@ -16,6 +16,11 @@ export type Analysis = {
   created_at: string;
 };
 
+export type SnapshotSaveResponse = {
+  filename: string;
+  path: string;
+};
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -75,6 +80,19 @@ export async function clearAnalyses(): Promise<void> {
   if (!response.ok) {
     throw new Error(await readError(response));
   }
+}
+
+export async function saveAnalysisSnapshot(
+  analysisId: number
+): Promise<SnapshotSaveResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/analyses/${analysisId}/snapshot`, {
+    method: "POST"
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+  return response.json();
 }
 
 async function readError(response: Response): Promise<string> {

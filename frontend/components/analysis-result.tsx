@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   Copy,
@@ -8,7 +11,7 @@ import {
   Tags,
   TriangleAlert
 } from "lucide-react";
-import type { Analysis } from "@/lib/api";
+import { saveAnalysisSnapshot, type Analysis } from "@/lib/api";
 import { ScoreRing } from "./score-ring";
 
 type AnalysisResultProps = {
@@ -16,13 +19,85 @@ type AnalysisResultProps = {
 };
 
 export function AnalysisResult({ analysis }: AnalysisResultProps) {
+  const [saveState, setSaveState] = useState<"pending" | "saving" | "saved" | "dismissed">(
+    "pending"
+  );
+  const [savedFilename, setSavedFilename] = useState("");
+  const [saveError, setSaveError] = useState("");
   const openers = analysis.cover_letter
     .split("\n")
     .map((item) => item.trim())
     .filter(Boolean);
 
+  useEffect(() => {
+    setSaveState("pending");
+    setSavedFilename("");
+    setSaveError("");
+  }, [analysis.id]);
+
+  async function handleSaveSnapshot() {
+    setSaveState("saving");
+    setSaveError("");
+    try {
+      const result = await saveAnalysisSnapshot(analysis.id);
+      setSavedFilename(result.filename);
+      setSaveState("saved");
+    } catch (caught) {
+      setSaveState("pending");
+      setSaveError(caught instanceof Error ? caught.message : "保存失败，请稍后重试");
+    }
+  }
+
   return (
     <section className="space-y-4">
+      {saveState !== "dismissed" ? (
+        <div className="rounded-lg border border-[#ded7cf] bg-[#fffdf9] p-4 shadow-[0_10px_28px_rgba(31,27,24,0.06)]">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-ink">
+                {saveState === "saved" ? "已保存本次方案" : "是否保存本次优化方案？"}
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-muted">
+                {saveState === "saved"
+                  ? `文件已写入 change_snapshots/${savedFilename}`
+                  : "保存后会在项目的 change_snapshots 文件夹生成一份 Markdown 方案。"}
+              </p>
+              {saveError ? (
+                <p className="mt-1 text-xs text-red-700">{saveError}</p>
+              ) : null}
+            </div>
+            {saveState === "saved" ? (
+              <button
+                type="button"
+                onClick={() => setSaveState("dismissed")}
+                className="inline-flex min-h-9 items-center justify-center rounded-md border border-[#ded7cf] bg-white px-3 text-sm font-semibold text-muted transition hover:border-copper hover:text-copper"
+              >
+                知道了
+              </button>
+            ) : (
+              <div className="flex shrink-0 gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveSnapshot}
+                  disabled={saveState === "saving"}
+                  className="inline-flex min-h-9 items-center justify-center rounded-md bg-[#2b2521] px-3 text-sm font-semibold text-white transition hover:bg-[#3b322d] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {saveState === "saving" ? "保存中" : "保存本次方案"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSaveState("dismissed")}
+                  disabled={saveState === "saving"}
+                  className="inline-flex min-h-9 items-center justify-center rounded-md border border-[#ded7cf] bg-white px-3 text-sm font-semibold text-muted transition hover:border-copper hover:text-copper disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  暂不保存
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+
       <div className="rounded-lg border border-[#ded7cf] bg-[#fffdf9] p-5 shadow-[0_14px_42px_rgba(31,27,24,0.07)]">
         <div className="grid gap-5 lg:grid-cols-[120px_minmax(0,1fr)]">
           <ScoreRing score={analysis.match_score} />

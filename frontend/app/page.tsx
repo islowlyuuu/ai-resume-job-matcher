@@ -69,7 +69,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1480px] gap-4 px-4 py-5 md:px-6 xl:h-[calc(100vh-65px)] xl:grid-cols-[300px_minmax(0,1fr)_300px] xl:overflow-hidden">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-4 px-4 py-5 md:px-6 xl:h-[calc(100vh-65px)] xl:grid-cols-[320px_minmax(0,1fr)_300px] xl:overflow-hidden">
         <div className="min-h-0">
           <AnalyzerForm onAnalysis={handleAnalysis} />
         </div>

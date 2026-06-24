@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     qwen_api_key: str = ""
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_model: str = "qwen-plus"
+    volcengine_api_key: str = ""
+    volcengine_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
+    volcengine_model: str = "deepseek-v4-pro"
     backend_cors_origins: str = "http://localhost:3000,http://localhost:3001"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
@@ -59,6 +62,13 @@ class Settings(BaseSettings):
                 "base_url": self.qwen_base_url,
                 "api_key": self.qwen_api_key,
                 "model": self.qwen_model,
+            },
+            "volcengine": {
+                "name": "火山引擎 / Volcengine",
+                "base_url": self.volcengine_base_url,
+                "api_key": self.volcengine_api_key,
+                "model": self.volcengine_model,
+                "supports_json_response": "false",
             },
         }
 

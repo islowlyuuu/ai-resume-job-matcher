@@ -65,10 +65,9 @@ async def _analyze_with_openai_compatible(
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
     skill_prompt = build_skill_prompt()
     system_prompt = f"{prompt}\n\n{skill_prompt}" if skill_prompt else prompt
-    response = await client.chat.completions.create(
-        model=provider_config["model"],
-        response_format={"type": "json_object"},
-        messages=[
+    create_kwargs: dict = {
+        "model": provider_config["model"],
+        "messages": [
             {"role": "system", "content": system_prompt},
             {
                 "role": "user",
@@ -81,7 +80,10 @@ async def _analyze_with_openai_compatible(
                 ),
             },
         ],
-    )
+    }
+    if provider_config.get("supports_json_response", "true") != "false":
+        create_kwargs["response_format"] = {"type": "json_object"}
+    response = await client.chat.completions.create(**create_kwargs)
     content = response.choices[0].message.content or "{}"
     result = AnalysisResult.model_validate_json(content)
     data = _with_missing_structured_fields(result).model_dump()

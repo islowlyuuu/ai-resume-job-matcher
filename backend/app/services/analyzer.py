@@ -15,23 +15,55 @@ async def analyze_resume(
     resume_text: str,
     job_description: str,
     output_mode: str = "boss",
+    provider: str = "default",
 ) -> AnalysisResult:
     settings = get_settings()
-    if settings.openai_api_key:
-        return await _analyze_with_openai(resume_text, job_description, output_mode)
-    return _analyze_locally(resume_text, job_description, output_mode)
+    selected_provider = _resolve_provider(provider, settings.ai_provider)
+    provider_config = settings.provider_configs.get(selected_provider, settings.provider_configs["local"])
+    if selected_provider == "local" or not provider_config.get("api_key"):
+        return _analyze_locally(
+            resume_text,
+            job_description,
+            output_mode,
+            ai_provider="local",
+            ai_model="local-keyword-analyzer",
+            used_fallback=selected_provider != "local",
+            provider_error="" if selected_provider == "local" else f"{provider_config['name']} 未配置 API Key",
+        )
+    try:
+        return await _analyze_with_openai_compatible(
+            resume_text,
+            job_description,
+            output_mode,
+            selected_provider,
+            provider_config,
+        )
+    except Exception as exc:
+        return _analyze_locally(
+            resume_text,
+            job_description,
+            output_mode,
+            ai_provider="local",
+            ai_model="local-keyword-analyzer",
+            used_fallback=True,
+            provider_error=f"{provider_config['name']} 请求失败，已降级本地分析：{exc}",
+        )
 
 
-async def _analyze_with_openai(
+async def _analyze_with_openai_compatible(
     resume_text: str,
     job_description: str,
     output_mode: str,
+    provider: str,
+    provider_config: dict[str, str],
 ) -> AnalysisResult:
-    settings = get_settings()
-    client = AsyncOpenAI(api_key=settings.openai_api_key)
+    client_kwargs = {"api_key": provider_config["api_key"]}
+    if provider_config.get("base_url"):
+        client_kwargs["base_url"] = provider_config["base_url"]
+    client = AsyncOpenAI(**client_kwargs)
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
     response = await client.chat.completions.create(
-        model=settings.openai_model,
+        model=provider_config["model"],
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": prompt},
@@ -49,13 +81,22 @@ async def _analyze_with_openai(
     )
     content = response.choices[0].message.content or "{}"
     result = AnalysisResult.model_validate_json(content)
-    return _with_missing_structured_fields(result)
+    data = _with_missing_structured_fields(result).model_dump()
+    data["ai_provider"] = provider
+    data["ai_model"] = provider_config["model"]
+    data["used_fallback"] = False
+    data["provider_error"] = ""
+    return AnalysisResult.model_validate(data)
 
 
 def _analyze_locally(
     resume_text: str,
     job_description: str,
     output_mode: str = "boss",
+    ai_provider: str = "local",
+    ai_model: str = "local-keyword-analyzer",
+    used_fallback: bool = False,
+    provider_error: str = "",
 ) -> AnalysisResult:
     resume_tokens = _keywords(resume_text)
     job_tokens = _keywords(job_description)
@@ -119,7 +160,38 @@ def _analyze_locally(
         missing_keywords=missing_labels[:10],
         edit_notes=edit_notes,
         cover_letter=_build_openers(job_title, overlap_labels, output_mode),
+        ai_provider=ai_provider,
+        ai_model=ai_model,
+        used_fallback=used_fallback,
+        provider_error=provider_error,
     )
+
+
+def get_provider_status() -> list[dict[str, object]]:
+    settings = get_settings()
+    default_provider = _resolve_provider("default", settings.ai_provider)
+    statuses = []
+    for key, config in settings.provider_configs.items():
+        configured = key == "local" or bool(config.get("api_key"))
+        statuses.append(
+            {
+                "id": key,
+                "name": config["name"],
+                "model": config["model"],
+                "base_url": config["base_url"],
+                "configured": configured,
+                "is_default": key == default_provider,
+                "supports_chat": True,
+            }
+        )
+    return statuses
+
+
+def _resolve_provider(provider: str, default_provider: str) -> str:
+    selected = (provider or "default").strip().lower()
+    if selected == "default":
+        selected = (default_provider or "local").strip().lower()
+    return selected if selected in get_settings().provider_configs else "local"
 
 
 def _keywords(text: str) -> set[str]:

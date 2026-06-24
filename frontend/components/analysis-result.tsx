@@ -120,6 +120,14 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
               <span className="rounded-md bg-[#f3eee8] px-2.5 py-1 text-xs font-medium text-muted">
                 {analysis.job_title}
               </span>
+              <span className="rounded-md bg-[#f6f7f9] px-2.5 py-1 text-xs font-medium text-[#5e6674]">
+                {analysis.ai_provider} · {analysis.ai_model}
+              </span>
+              {analysis.used_fallback ? (
+                <span className="rounded-md border border-[#eaded6] bg-white px-2.5 py-1 text-xs font-medium text-copper">
+                  已本地降级
+                </span>
+              ) : null}
             </div>
             <h2 className="mt-3 text-2xl font-semibold text-ink">
               这份简历当前匹配度为 {analysis.match_score}%
@@ -127,6 +135,11 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
             <p className="mt-3 text-sm leading-6 text-muted">
               {analysis.summary}
             </p>
+            {analysis.provider_error ? (
+              <p className="mt-2 rounded-md border border-[#eaded6] bg-[#fbf7f1] px-3 py-2 text-xs leading-5 text-copper">
+                {analysis.provider_error}
+              </p>
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.ats_keywords.slice(0, 8).map((keyword) => (
                 <span

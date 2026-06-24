@@ -5,13 +5,28 @@ from sqlmodel import Session, delete, select
 
 from app.core.database import get_session
 from app.models.analysis import AnalysisRecord
-from app.schemas.analysis import AnalysisRead, AnalyzeTextRequest, SnapshotSaveResponse
-from app.services.analyzer import analyze_resume, record_to_result, result_to_record_payload
+from app.schemas.analysis import (
+    AnalysisRead,
+    AnalyzeTextRequest,
+    ProviderStatus,
+    SnapshotSaveResponse,
+)
+from app.services.analyzer import (
+    analyze_resume,
+    get_provider_status,
+    record_to_result,
+    result_to_record_payload,
+)
 from app.services.exporter import build_pdf_bytes, build_resume_docx
 from app.services.file_parser import extract_text
 from app.services.snapshot_writer import save_analysis_snapshot
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
+
+
+@router.get("/providers", response_model=list[ProviderStatus])
+def list_providers() -> list[dict[str, object]]:
+    return get_provider_status()
 
 
 @router.get("", response_model=list[AnalysisRead])
@@ -84,6 +99,7 @@ async def analyze_text(
         payload.resume_text,
         payload.job_description,
         payload.output_mode,
+        payload.provider,
     )
     record = AnalysisRecord(
         **result_to_record_payload(result, payload.resume_text, payload.job_description)
@@ -98,6 +114,7 @@ async def analyze_text(
 async def analyze_upload(
     job_description: str = Form(...),
     output_mode: str = Form("boss"),
+    provider: str = Form("default"),
     resume: UploadFile = File(...),
     session: Session = Depends(get_session),
 ) -> dict:
@@ -109,7 +126,7 @@ async def analyze_upload(
     if len(resume_text.strip()) < 20:
         raise HTTPException(status_code=400, detail="无法从文件中提取足够的简历文本。")
 
-    result = await analyze_resume(resume_text, job_description, output_mode)
+    result = await analyze_resume(resume_text, job_description, output_mode, provider)
     record = AnalysisRecord(
         **result_to_record_payload(result, resume_text, job_description)
     )

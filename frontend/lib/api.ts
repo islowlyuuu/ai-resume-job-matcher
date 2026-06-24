@@ -19,10 +19,24 @@ export type Analysis = {
   missing_keywords: string[];
   edit_notes: string[];
   cover_letter: string;
+  ai_provider: string;
+  ai_model: string;
+  used_fallback: boolean;
+  provider_error: string;
   created_at: string;
 };
 
 export type OutputMode = "boss" | "formal" | "intern";
+
+export type ProviderStatus = {
+  id: string;
+  name: string;
+  model: string;
+  base_url: string;
+  configured: boolean;
+  is_default: boolean;
+  supports_chat: boolean;
+};
 
 export type SnapshotSaveResponse = {
   filename: string;
@@ -35,7 +49,8 @@ const API_BASE_URL =
 export async function analyzeText(
   resumeText: string,
   jobDescription: string,
-  outputMode: OutputMode
+  outputMode: OutputMode,
+  provider: string
 ): Promise<Analysis> {
   const response = await fetch(`${API_BASE_URL}/api/analyses/text`, {
     method: "POST",
@@ -43,7 +58,8 @@ export async function analyzeText(
     body: JSON.stringify({
       resume_text: resumeText,
       job_description: jobDescription,
-      output_mode: outputMode
+      output_mode: outputMode,
+      provider
     })
   });
 
@@ -56,12 +72,14 @@ export async function analyzeText(
 export async function analyzeUpload(
   resume: File,
   jobDescription: string,
-  outputMode: OutputMode
+  outputMode: OutputMode,
+  provider: string
 ): Promise<Analysis> {
   const formData = new FormData();
   formData.append("resume", resume);
   formData.append("job_description", jobDescription);
   formData.append("output_mode", outputMode);
+  formData.append("provider", provider);
 
   const response = await fetch(`${API_BASE_URL}/api/analyses/upload`, {
     method: "POST",
@@ -76,6 +94,16 @@ export async function analyzeUpload(
 
 export async function listAnalyses(): Promise<Analysis[]> {
   const response = await fetch(`${API_BASE_URL}/api/analyses`, {
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+  return response.json();
+}
+
+export async function listProviders(): Promise<ProviderStatus[]> {
+  const response = await fetch(`${API_BASE_URL}/api/analyses/providers`, {
     cache: "no-store"
   });
   if (!response.ok) {

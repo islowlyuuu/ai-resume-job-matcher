@@ -34,6 +34,8 @@ def _to_markdown(analysis: AnalysisRead) -> str:
             f"# {analysis.candidate_name} - {analysis.job_title}",
             "",
             f"- 匹配分：{analysis.match_score}%",
+            f"- AI 模型：{analysis.ai_provider} / {analysis.ai_model}",
+            f"- 是否本地降级：{'是' if analysis.used_fallback else '否'}",
             f"- 生成时间：{analysis.created_at.isoformat()}",
             "",
             "## 匹配总结",

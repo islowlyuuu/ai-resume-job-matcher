@@ -23,6 +23,9 @@ def test_local_analyzer_returns_score_without_openai_key(monkeypatch):
     assert result.job_business_contexts
     assert result.job_hard_requirements
     assert result.covered_keywords
+    assert result.ai_provider == "local"
+    assert result.ai_model == "local-keyword-analyzer"
+    assert result.used_fallback is False
     assert "尊敬" not in result.cover_letter
     assert "此致" not in result.cover_letter
     assert "您好" in result.cover_letter

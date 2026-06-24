@@ -27,6 +27,11 @@ def test_analyze_text_snapshot_and_docx_export(monkeypatch, tmp_path):
     payload = response.json()
     assert payload["job_core_skills"]
     assert payload["covered_keywords"]
+    assert payload["ai_provider"] == "local"
+
+    providers = client.get("/api/analyses/providers")
+    assert providers.status_code == 200
+    assert any(item["id"] == "deepseek" for item in providers.json())
 
     snapshot = client.post(f"/api/analyses/{payload['id']}/snapshot")
     assert snapshot.status_code == 200

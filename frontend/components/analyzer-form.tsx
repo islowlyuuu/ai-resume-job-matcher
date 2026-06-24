@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   BadgeInfo,
   FileUp,
@@ -8,7 +8,14 @@ import {
   RotateCcw,
   Sparkles
 } from "lucide-react";
-import { analyzeText, analyzeUpload, type Analysis, type OutputMode } from "@/lib/api";
+import {
+  analyzeText,
+  analyzeUpload,
+  listProviders,
+  type Analysis,
+  type OutputMode,
+  type ProviderStatus
+} from "@/lib/api";
 
 type AnalyzerFormProps = {
   onAnalysis: (analysis: Analysis) => void;
@@ -24,9 +31,34 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);
   const [jobDescription, setJobDescription] = useState(SAMPLE_JOB);
   const [outputMode, setOutputMode] = useState<OutputMode>("boss");
+  const [provider, setProvider] = useState("default");
+  const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    listProviders()
+      .then((items) => {
+        setProviders(items);
+        const defaultProvider = items.find((item) => item.is_default);
+        setProvider(defaultProvider?.id ?? "local");
+      })
+      .catch(() => {
+        setProviders([
+          {
+            id: "local",
+            name: "本地关键词分析",
+            model: "local-keyword-analyzer",
+            base_url: "",
+            configured: true,
+            is_default: true,
+            supports_chat: true
+          }
+        ]);
+        setProvider("local");
+      });
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,8 +67,8 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
     try {
       const result = resumeFile
-        ? await analyzeUpload(resumeFile, jobDescription, outputMode)
-        : await analyzeText(resumeText, jobDescription, outputMode);
+        ? await analyzeUpload(resumeFile, jobDescription, outputMode, provider)
+        : await analyzeText(resumeText, jobDescription, outputMode, provider);
       onAnalysis(result);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "分析失败，请稍后重试");
@@ -64,6 +96,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             setResumeText(SAMPLE_RESUME);
             setJobDescription(SAMPLE_JOB);
             setOutputMode("boss");
+            setProvider(providers.find((item) => item.is_default)?.id ?? "local");
             setResumeFile(null);
           }}
           className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#ded7cf] bg-white text-muted transition hover:border-copper hover:text-copper"
@@ -122,6 +155,25 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             />
           </div>
         </div>
+
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold text-ink">AI 模型</span>
+          <select
+            value={provider}
+            onChange={(event) => setProvider(event.target.value)}
+            className="h-10 w-full rounded-md border border-[#ded7cf] bg-white px-3 text-sm text-ink outline-none ring-copper/20 transition focus:border-copper focus:ring-4"
+          >
+            {providers.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+                {item.configured ? "" : "（未配置，自动本地降级）"}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block truncate text-xs text-muted">
+            {providers.find((item) => item.id === provider)?.model ?? "local-keyword-analyzer"}
+          </span>
+        </label>
 
         <label className="flex max-w-full cursor-pointer items-center gap-3 rounded-md border border-[#ded7cf] bg-white px-3 py-2 text-sm text-muted transition hover:border-copper hover:text-copper">
           <FileUp className="h-4 w-4 shrink-0" />

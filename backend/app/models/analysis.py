@@ -25,6 +25,10 @@ class AnalysisRecord(SQLModel, table=True):
     missing_keywords: str = Field(default="[]")
     edit_notes: str = Field(default="[]")
     cover_letter: str
+    ai_provider: str = Field(default="local")
+    ai_model: str = Field(default="local-keyword-analyzer")
+    used_fallback: bool = Field(default=False)
+    provider_error: str = Field(default="")
     resume_text: str
     job_description: str
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)

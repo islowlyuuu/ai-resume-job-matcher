@@ -39,6 +39,10 @@ def _ensure_analysis_columns() -> None:
         "covered_keywords": "TEXT DEFAULT '[]'",
         "missing_keywords": "TEXT DEFAULT '[]'",
         "edit_notes": "TEXT DEFAULT '[]'",
+        "ai_provider": "TEXT DEFAULT 'local'",
+        "ai_model": "TEXT DEFAULT 'local-keyword-analyzer'",
+        "used_fallback": "BOOLEAN DEFAULT 0",
+        "provider_error": "TEXT DEFAULT ''",
     }
 
     with engine.begin() as connection:

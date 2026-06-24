@@ -23,6 +23,10 @@ class AnalysisResult(BaseModel):
     missing_keywords: list[str] = Field(default_factory=list)
     edit_notes: list[str]
     cover_letter: str
+    ai_provider: str = "local"
+    ai_model: str = "local-keyword-analyzer"
+    used_fallback: bool = False
+    provider_error: str = ""
 
 
 class AnalysisRead(AnalysisResult):
@@ -34,8 +38,19 @@ class AnalyzeTextRequest(BaseModel):
     resume_text: str = Field(min_length=20)
     job_description: str = Field(min_length=20)
     output_mode: str = "boss"
+    provider: str = "default"
 
 
 class SnapshotSaveResponse(BaseModel):
     filename: str
     path: str
+
+
+class ProviderStatus(BaseModel):
+    id: str
+    name: str
+    model: str
+    base_url: str
+    configured: bool
+    is_default: bool
+    supports_chat: bool

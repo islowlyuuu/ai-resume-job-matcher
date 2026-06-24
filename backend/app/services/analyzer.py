@@ -6,6 +6,7 @@ from openai import AsyncOpenAI
 
 from app.core.config import get_settings
 from app.schemas.analysis import AnalysisResult
+from app.skills import build_skill_prompt
 
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "resume_matcher.md"
@@ -62,11 +63,13 @@ async def _analyze_with_openai_compatible(
         client_kwargs["base_url"] = provider_config["base_url"]
     client = AsyncOpenAI(**client_kwargs)
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
+    skill_prompt = build_skill_prompt()
+    system_prompt = f"{prompt}\n\n{skill_prompt}" if skill_prompt else prompt
     response = await client.chat.completions.create(
         model=provider_config["model"],
         response_format={"type": "json_object"},
         messages=[
-            {"role": "system", "content": prompt},
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
                 "content": (

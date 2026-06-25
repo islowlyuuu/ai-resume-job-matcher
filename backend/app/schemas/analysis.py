@@ -41,6 +41,10 @@ class AnalyzeTextRequest(BaseModel):
     provider: str = "default"
 
 
+class ResumeTextExtractResponse(BaseModel):
+    resume_text: str
+
+
 class SnapshotSaveResponse(BaseModel):
     filename: str
     path: str

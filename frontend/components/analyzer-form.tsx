@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import {
   analyzeText,
-  analyzeUpload,
+  extractResumeText,
   listProviders,
   type Analysis,
   type OutputMode,
@@ -35,6 +35,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isParsingResume, setIsParsingResume] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -66,14 +67,37 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
     setError("");
 
     try {
-      const result = resumeFile
-        ? await analyzeUpload(resumeFile, jobDescription, outputMode, provider)
-        : await analyzeText(resumeText, jobDescription, outputMode, provider);
+      const result = await analyzeText(
+        resumeText,
+        jobDescription,
+        outputMode,
+        provider
+      );
       onAnalysis(result);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "分析失败，请稍后重试");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleResumeFileChange(file: File | null) {
+    setResumeFile(file);
+    setError("");
+
+    if (!file) {
+      return;
+    }
+
+    setIsParsingResume(true);
+    try {
+      const extractedText = await extractResumeText(file);
+      setResumeText(extractedText);
+    } catch (caught) {
+      setResumeFile(null);
+      setError(caught instanceof Error ? caught.message : "简历文件解析失败");
+    } finally {
+      setIsParsingResume(false);
     }
   }
 
@@ -115,6 +139,7 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
           <textarea
             value={resumeText}
             onChange={(event) => setResumeText(event.target.value)}
+            required
             placeholder="粘贴你当前简历，或者上传 PDF / Word"
             className="mt-2 min-h-0 flex-1 resize-none overflow-auto rounded-md border border-[#ddd6cf] bg-[#fffdf9] p-3 text-[13px] leading-5 text-ink outline-none ring-copper/20 transition placeholder:text-stone-400 focus:border-copper focus:ring-4"
           />
@@ -181,12 +206,18 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
             选择文件
           </span>
           <span className="min-w-0 flex-1 truncate">
-            {resumeFile ? resumeFile.name : "未选择任何文件"}
+            {isParsingResume
+              ? "正在提取简历内容..."
+              : resumeFile
+                ? resumeFile.name
+                : "未选择任何文件"}
           </span>
           <input
             type="file"
             accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              void handleResumeFileChange(event.target.files?.[0] ?? null);
+            }}
             className="sr-only"
           />
         </label>
@@ -197,15 +228,15 @@ export function AnalyzerForm({ onAnalysis }: AnalyzerFormProps) {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isParsingResume}
           className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#2b2521] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(31,27,24,0.18)] transition hover:bg-[#3b322d] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isLoading ? (
+          {isLoading || isParsingResume ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Sparkles className="h-4 w-4" />
           )}
-          生成优化方案
+          {isParsingResume ? "正在读取简历" : "生成优化方案"}
         </button>
       </div>
 

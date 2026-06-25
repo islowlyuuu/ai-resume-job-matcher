@@ -92,6 +92,23 @@ export async function analyzeUpload(
   return response.json();
 }
 
+export async function extractResumeText(resume: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("resume", resume);
+
+  const response = await fetch(`${API_BASE_URL}/api/analyses/extract-resume`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const payload = (await response.json()) as { resume_text: string };
+  return payload.resume_text;
+}
+
 export async function listAnalyses(): Promise<Analysis[]> {
   const response = await fetch(`${API_BASE_URL}/api/analyses`, {
     cache: "no-store"

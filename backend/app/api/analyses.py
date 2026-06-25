@@ -9,6 +9,7 @@ from app.schemas.analysis import (
     AnalysisRead,
     AnalyzeTextRequest,
     ProviderStatus,
+    ResumeTextExtractResponse,
     SnapshotSaveResponse,
 )
 from app.services.analyzer import (
@@ -108,6 +109,21 @@ async def analyze_text(
     session.commit()
     session.refresh(record)
     return record_to_result(record)
+
+
+@router.post("/extract-resume", response_model=ResumeTextExtractResponse)
+async def extract_resume_text(
+    resume: UploadFile = File(...),
+) -> ResumeTextExtractResponse:
+    try:
+        resume_text = await extract_text(resume)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if len(resume_text.strip()) < 20:
+        raise HTTPException(status_code=400, detail="无法从文件中提取足够的简历文本。")
+
+    return ResumeTextExtractResponse(resume_text=resume_text)
 
 
 @router.post("/upload", response_model=AnalysisRead)
